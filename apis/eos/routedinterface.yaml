@@ -1,0 +1,53 @@
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: routedinterfaces.eos.netclab.dev
+spec:
+  scope: Cluster
+  group: eos.netclab.dev
+  names:
+    kind: RoutedInterface
+    plural: routedinterfaces
+    categories:
+    - crossplane
+    - netclab
+  versions:
+    - name: v1alpha1
+      additionalPrinterColumns:
+      - name: NODE-PORT
+        type: string
+        jsonPath: .spec.nodePort
+      - name: NAME
+        type: string
+        jsonPath: .spec.name
+      - name: IPV4-ADDRESS
+        type: string
+        jsonPath: .spec.ipv4Address
+      - name: IPV4-PREFIX
+        type: integer
+        jsonPath: .spec.ipv4Prefix
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                nodePort:
+                  type: string
+                creds:
+                  type: string
+                name:
+                  type: string
+                ipv4Address:
+                  type: string
+                ipv4Prefix:
+                  type: integer
+              required:
+                - nodePort
+                - creds
+                - name
+                - ipv4Address
+                - ipv4Prefix

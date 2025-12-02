@@ -1,0 +1,47 @@
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: bgpglobals.eos.netclab.dev
+spec:
+  scope: Cluster
+  group: eos.netclab.dev
+  names:
+    kind: BgpGlobal
+    plural: bgpglobals
+    categories:
+    - crossplane
+    - netclab
+  versions:
+    - name: v1alpha1
+      additionalPrinterColumns:
+      - name: NODE-PORT
+        type: string
+        jsonPath: .spec.nodePort
+      - name: ASN
+        type: integer
+        jsonPath: .spec.asn
+      - name: ROUTER-ID
+        type: string
+        jsonPath: .spec.routerId
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                nodePort:
+                  type: string
+                creds:
+                  type: string
+                asn:
+                  type: integer
+                routerId:
+                  type: string
+              required:
+                - nodePort
+                - creds
+                - asn
+                - routerId

@@ -1,0 +1,10 @@
+apiVersion: eos.netclab.dev/v1alpha1
+kind: RoutedInterface
+metadata:
+  name: r1lo0ip
+spec:
+  nodePort: ceos01.default.svc.cluster.local:6020
+  creds: YXJpc3RhOmFyaXN0YQ==
+  name: Loopback0
+  ipv4Address: 1.1.1.1
+  ipv4Prefix: 32

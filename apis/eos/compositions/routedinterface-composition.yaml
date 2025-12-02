@@ -1,0 +1,81 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: routedinterfaces.eos.netclab.dev
+spec:
+  compositeTypeRef:
+    apiVersion: eos.netclab.dev/v1alpha1
+    kind: RoutedInterface
+  mode: Pipeline
+  pipeline:
+  - step: create-request
+    functionRef:
+      name: function-go-templating
+    input:
+      apiVersion: gotemplating.fn.crossplane.io/v1beta1
+      kind: GoTemplate
+      source: Inline
+      inline:
+        template: |
+          apiVersion: http.crossplane.io/v1alpha2
+          kind: Request
+          metadata:
+            annotations:
+              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.spec.name }}-ipv4
+          spec:
+            forProvider:
+              insecureSkipTLSVerify: true
+              headers:
+                Accept: ["application/yang-data+json"]
+                Authorization: ["Basic {{ .observed.composite.resource.spec.creds }}"]
+              payload:
+                baseUrl: "https://{{ .observed.composite.resource.spec.nodePort }}/restconf/data/openconfig-interfaces:interfaces/interface={{ .observed.composite.resource.spec.name }}/subinterfaces/subinterface=0"
+                body: |
+                  {
+                    "index": 0,
+                    "openconfig-if-ip:ipv4": {
+                      "config": {"enabled": true},
+                      "addresses": {
+                        "address": [
+                          {
+                            "config": {
+                              "ip": "{{ .observed.composite.resource.spec.ipv4Address }}",
+                              "prefix-length": {{ .observed.composite.resource.spec.ipv4Prefix }}
+                            },
+                            "ip": "{{ .observed.composite.resource.spec.ipv4Address }}"
+                          }
+                        ]
+                      }
+                    }
+                  }
+
+              mappings:
+              - action: CREATE
+                method: PUT
+                body: .payload.body
+                url: .payload.baseUrl
+
+              - action: UPDATE
+                method: PUT
+                body: .payload.body
+                url: .payload.baseUrl
+
+              - action: OBSERVE
+                url: .payload.baseUrl + "/ipv4/addresses/address={{ .observed.composite.resource.spec.ipv4Address }}"
+
+              - action: REMOVE
+                method: DELETE
+                url: .payload.baseUrl
+
+              expectedResponseCheck:
+                type: CUSTOM
+                logic: |
+                  if .response.body."openconfig-if-ip:config".ip == "{{ .observed.composite.resource.spec.ipv4Address }}"
+                  and .response.body."openconfig-if-ip:config"."prefix-length" == {{ .observed.composite.resource.spec.ipv4Prefix }}
+                  then true
+                  else false
+                  end
+
+  - step: auto-ready
+    functionRef:
+      name: function-auto-ready

@@ -1,0 +1,56 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: bgpglobals.eos.netclab.dev
+spec:
+  compositeTypeRef:
+    apiVersion: eos.netclab.dev/v1alpha1
+    kind: BgpGlobal
+  mode: Pipeline
+  pipeline:
+  - step: create-request
+    functionRef:
+      name: function-go-templating
+    input:
+      apiVersion: gotemplating.fn.crossplane.io/v1beta1
+      kind: GoTemplate
+      source: Inline
+      inline:
+        template: |
+          apiVersion: http.crossplane.io/v1alpha2
+          kind: Request
+          metadata:
+            annotations:
+              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-asid
+          spec:
+            forProvider:
+              insecureSkipTLSVerify: true
+              headers:
+                Accept: ["application/yang-data+json"]
+                Authorization: ["Basic {{ .observed.composite.resource.spec.creds }}"]
+              payload:
+                baseUrl: "https://{{ .observed.composite.resource.spec.nodePort }}/restconf/data/openconfig-network-instance:network-instances/network-instance=default/protocols/protocol=BGP,BGP/bgp/global/config"
+                body: |
+                  { "openconfig-network-instance:as": {{ .observed.composite.resource.spec.asn }}, "openconfig-network-instance:router-id": "{{ .observed.composite.resource.spec.routerId }}" }
+
+              mappings:
+              - action: CREATE
+                method: PATCH
+                body: .payload.body
+                url: .payload.baseUrl
+
+              - action: UPDATE
+                method: PATCH
+                body: .payload.body
+                url: .payload.baseUrl
+
+              - action: OBSERVE
+                url: .payload.baseUrl
+
+              - action: REMOVE
+                method: DELETE
+                url: .payload.baseUrl
+
+  - step: auto-ready
+    functionRef:
+      name: function-auto-ready

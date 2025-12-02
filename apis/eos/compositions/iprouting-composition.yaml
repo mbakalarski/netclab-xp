@@ -1,0 +1,75 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: iproutings.eos.netclab.dev
+spec:
+  compositeTypeRef:
+    apiVersion: eos.netclab.dev/v1alpha1
+    kind: IpRouting
+  mode: Pipeline
+  pipeline:
+  - step: create-request
+    functionRef:
+      name: function-go-templating
+    input:
+      apiVersion: gotemplating.fn.crossplane.io/v1beta1
+      kind: GoTemplate
+      source: Inline
+      inline:
+        template: |
+          apiVersion: http.crossplane.io/v1alpha2
+          kind: Request
+          metadata:
+            annotations:
+              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-iprouting
+          spec:
+            forProvider:
+              insecureSkipTLSVerify: true
+              headers:
+                Accept: ["application/yang-data+json"]
+                Authorization: ["Basic {{ .observed.composite.resource.spec.creds }}"]
+              payload:
+                baseUrl: "https://{{ .observed.composite.resource.spec.nodePort }}/restconf/data/openconfig-network-instance:network-instances/network-instance=default/config"
+                body: |
+                  { "arista-netinst-augments:ipv4-routing-enabled": true }
+
+              mappings:
+              - action: CREATE
+                method: PATCH
+                body: .payload.body
+                url: .payload.baseUrl
+
+              - action: UPDATE
+                method: PATCH
+                body: .payload.body
+                url: .payload.baseUrl
+
+              - action: OBSERVE
+                url: .payload.baseUrl
+
+              - action: REMOVE
+                method: PATCH
+                url: .payload.baseUrl
+                body: |
+                  { "arista-netinst-augments:ipv4-routing-enabled": false }
+
+              expectedResponseCheck:
+                type: CUSTOM
+                logic: |
+                  if .response.body."openconfig-network-instance:name" == "default"
+                  and (.response.body | has("arista-netinst-augments:ipv4-routing-enabled")) == false
+                  then true
+                  else false
+                  end
+
+              isRemovedCheck:
+                type: CUSTOM
+                logic: |
+                  if .response.body."arista-netinst-augments:ipv4-routing-enabled" == false
+                  then true
+                  else false
+                  end
+
+  - step: auto-ready
+    functionRef:
+      name: function-auto-ready

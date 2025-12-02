@@ -1,0 +1,35 @@
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: iproutings.eos.netclab.dev
+spec:
+  scope: Cluster
+  group: eos.netclab.dev
+  names:
+    kind: IpRouting
+    plural: iproutings
+    categories:
+    - crossplane
+    - netclab
+  versions:
+    - name: v1alpha1
+      additionalPrinterColumns:
+      - name: NODE-PORT
+        type: string
+        jsonPath: .spec.nodePort
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                nodePort:
+                  type: string
+                creds:
+                  type: string
+              required:
+                - nodePort
+                - creds
