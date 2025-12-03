@@ -1,0 +1,23 @@
+apiVersion: meta.pkg.crossplane.io/v1alpha1
+kind: Configuration
+metadata:
+  name: netclab-xp
+spec:
+  dependsOn:
+    - apiVersion: pkg.crossplane.io/v1
+      kind: Provider
+      package: xpkg.upbound.io/crossplane-contrib/provider-http
+      version: ">=v1.0.12"
+
+    - apiVersion: pkg.crossplane.io/v1
+      kind: Function
+      package: xpkg.upbound.io/crossplane-contrib/function-go-templating
+      version: ">=v0.11.1"
+
+    - apiVersion: pkg.crossplane.io/v1
+      kind: Function
+      package: xpkg.upbound.io/crossplane-contrib/function-auto-ready
+      version: ">=v0.5.2"
+
+  crossplane:
+    version: ">=v2.1.1"
