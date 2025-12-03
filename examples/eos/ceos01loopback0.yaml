@@ -1,0 +1,8 @@
+apiVersion: eos.netclab.dev/v1alpha1
+kind: LoopbackInterface
+metadata:
+  name: ceos01lo0
+spec:
+  nodePort: ceos01.default.svc.cluster.local:6020
+  creds: YXJpc3RhOmFyaXN0YQ==
+  name: Loopback0

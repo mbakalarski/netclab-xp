@@ -1,0 +1,7 @@
+apiVersion: eos.netclab.dev/v1alpha1
+kind: IpRouting
+metadata:
+  name: ceos01
+spec:
+  nodePort: ceos01.default.svc.cluster.local:6020
+  creds: YXJpc3RhOmFyaXN0YQ==

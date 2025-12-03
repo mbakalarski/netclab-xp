@@ -1,0 +1,53 @@
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: bgpneighbors.eos.netclab.dev
+spec:
+  scope: Cluster
+  group: eos.netclab.dev
+  names:
+    kind: BgpNeighbor
+    plural: bgpneighbors
+    categories:
+    - crossplane
+    - netclab
+  versions:
+    - name: v1alpha1
+      additionalPrinterColumns:
+      - name: NODE-PORT
+        type: string
+        jsonPath: .spec.nodePort
+      - name: NI
+        type: string
+        jsonPath: .spec.networkInstance
+      - name: REMOTE-AS
+        type: integer
+        jsonPath: .spec.neighborAsn
+      - name: REMOTE-IP
+        type: string
+        jsonPath: .spec.neighborIp
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                nodePort:
+                  type: string
+                creds:
+                  type: string
+                networkInstance:
+                  type: string
+                neighborAsn:
+                  type: integer
+                neighborIp:
+                  type: string
+              required:
+                - nodePort
+                - creds
+                - networkInstance
+                - neighborAsn
+                - neighborIp
