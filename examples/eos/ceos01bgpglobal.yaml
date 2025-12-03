@@ -1,9 +1,9 @@
 apiVersion: eos.netclab.dev/v1alpha1
 kind: BgpGlobal
 metadata:
-  name: r1bgp
+  name: ceos01
 spec:
   nodePort: ceos01.default.svc.cluster.local:6020
   creds: YXJpc3RhOmFyaXN0YQ==
   asn: 65001
-  routerId: 1.1.1.1
+  routerId: 10.0.0.1

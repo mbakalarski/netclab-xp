@@ -1,0 +1,10 @@
+apiVersion: eos.netclab.dev/v1alpha1
+kind: RoutedInterface
+metadata:
+  name: ceos01e1
+spec:
+  nodePort: ceos01.default.svc.cluster.local:6020
+  creds: YXJpc3RhOmFyaXN0YQ==
+  name: Ethernet1
+  ipv4Address: 10.1.2.1
+  ipv4Prefix: 24
