@@ -70,7 +70,7 @@ This approach enables:
 ### Requirements
 
 * RESTCONF access to target routers
-  (typically provided via [`netclab-chart`](https://github.com/mbakalarski/netclab-chart))
+  (provided here via [`netclab-chart`](https://github.com/mbakalarski/netclab-chart))
 * A Kubernetes cluster with Crossplane installed
   (in this setup, the same cluster that runs the netclab-chart topology)
 * The `netclab-xp` configuration package, which includes all required Crossplane dependencies.
