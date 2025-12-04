@@ -24,10 +24,10 @@ Loopback / RoutedInterface / BgpGlobal / BgpNeighbor
 provider-http (RESTCONF)
 ```
 
-- **High-Level Services:** Vendor-neutral abstractions such as `FabricIP` and `EvpnService`.
-- **Mid-Level Abstractions:** Router constructs composed from multiple low-level XRDs (`EosRouter`).
-- **Low-Level XRDs:** Vendor-specific resources directly representing YANG models (e.g., `RoutedInterface`, `BgpNeighbor`).
-- **Lowest Layer:** Raw RESTCONF operations via `provider-http`.
+* **High-Level Services:** Vendor-neutral abstractions such as `FabricIP` and `EvpnService`.
+* **Mid-Level Abstractions:** Router constructs composed from multiple low-level XRDs (`EosRouter`).
+* **Low-Level XRDs:** Vendor-specific resources directly representing YANG models (e.g., `RoutedInterface`, `BgpNeighbor`).
+* **Lowest Layer:** Raw RESTCONF operations via `provider-http`.
 
 This model hides vendor-specific complexity while enabling reusable, declarative network configuration.
 
@@ -59,8 +59,9 @@ This approach enables:
 
 * **RESTCONF-enabled routers**
   *Currently supported:* Arista EOS
+
 * **Other vendors**
-  Not yet supported. Additional capabilities may be added via new providers or JSON-RPC through `provider-http` where applicable.
+  Not yet supported. Additional capabilities may be added via new providers or JSON-RPC through `provider-http` if applicable.
 
 ---
 
@@ -69,16 +70,18 @@ This approach enables:
 ### Requirements
 
 * RESTCONF access to target routers
-  (here provided via [`netclab-chart`](https://github.com/mbakalarski/netclab-chart))
+  (typically provided via [`netclab-chart`](https://github.com/mbakalarski/netclab-chart))
 * A Kubernetes cluster with Crossplane installed
-  (here is the same cluster that supports the netclab-chart topology)
-* The `netclab-xp` configuration package bundles all required crossplane dependencies.
+  (in this setup, the same cluster that runs the netclab-chart topology)
+* The `netclab-xp` configuration package, which includes all required Crossplane dependencies.
 
-### Installation steps
+### Installation Steps
 
-- Install [`netclab-chart`](https://github.com/mbakalarski/netclab-chart), this gives you the KinD cluster and tools
+#### 1. Install [`netclab-chart`](https://github.com/mbakalarski/netclab-chart)
 
-- Install Crossplane
+This provides the KinD cluster and tooling.
+
+#### 2. Install Crossplane
 
 ```bash
 helm repo add crossplane-stable https://charts.crossplane.io/stable
@@ -88,7 +91,7 @@ helm install crossplane crossplane-stable/crossplane \
   --namespace crossplane-system --create-namespace
 ```
 
-- Install the netclab-xp Configuration Package
+#### 3. Install the netclab-xp Configuration Package
 
 ```bash
 cat <<EOF | kubectl apply -f -
@@ -101,7 +104,7 @@ spec:
 EOF
 ```
 
-- Add ProviderConfig for Http provider
+#### 4. Add ProviderConfig for the HTTP provider
 
 ```bash
 cat <<EOF | kubectl apply -f -
@@ -119,9 +122,10 @@ EOF
 
 ## Example Usage
 
-- Start netclab-chart topology with two cEOS routers
-> You would observe retrying pods for jobs generating certs on cEOS.
-> It is OK as booting of cEOS take time.
+### Start netclab-chart topology with two cEOS routers
+
+> You may observe retrying pods for jobs generating certificates on cEOS.
+> This is expected — booting cEOS takes time.
 
 ```bash
 cat << EOF | helm install ceos netclab/netclab --values -
@@ -156,7 +160,7 @@ topology:
     interfaces:
     - name: e1
       network: b2
-  - name: h01
+  - name: h02
     type: linux
     interfaces:
     - name: e1
@@ -164,23 +168,27 @@ topology:
 EOF
 ```
 
-- Check topology state
+### Check topology state
 
 ```bash
 kubectl get pod
 ```
 
-```bash
-NAME                         READY   STATUS      RESTARTS       AGE
-ceos01                       1/1     Running     0              2m
-ceos01-generate-cert-r7kml   0/1     Completed   4              2m
-ceos02                       1/1     Running     0              2m
-ceos02-generate-cert-nxfp4   0/1     Completed   4              2m
+Example:
+
+```
+NAME                         READY   STATUS      RESTARTS   AGE
+ceos01                       1/1     Running     0          2m
+ceos01-generate-cert-r7kml   0/1     Completed   4          2m
+ceos02                       1/1     Running     0          2m
+ceos02-generate-cert-nxfp4   0/1     Completed   4          2m
 ```
 
-### RoutedInterface (Arista EOS)
+---
 
-- Get one interface configured on ceos01:
+## RoutedInterface
+
+### Apply interface configuration on ceos01:
 
 ```bash
 cat <<EOF | kubectl apply -f -
@@ -197,7 +205,7 @@ spec:
 EOF
 ```
 
-- Check resource state:
+### Check resource state:
 
 ```bash
 kubectl get netclab
@@ -205,15 +213,18 @@ kubectl get netclab
 
 Example output:
 
-```bash
+```
 NAME                                     NODE-PORT                               NAME        IPV4-ADDRESS   IPV4-PREFIX   SYNCED   READY   COMPOSITION                        AGE
 routedinterface.eos.netclab.dev/r1e1ip   ceos01.default.svc.cluster.local:6020   Ethernet1   10.10.10.1     24            True     True    routedinterfaces.eos.netclab.dev   7s
 ```
 
-On the router:
+### Check device configuration:
+
+```bash
+kubectl exec -ti ceos01 -- Cli
+```
 
 ```console
-kubectl exec -ti ceos01 -- Cli
 ceos01>en
 ceos01#show run int Ethernet1
 interface Ethernet1
@@ -221,7 +232,7 @@ interface Ethernet1
    ip address 10.10.10.1/24
 ```
 
-- Remove configuration of Ethernet1
+### Remove configuration
 
 ```bash
 kubectl delete routedinterface r1e1ip
@@ -229,18 +240,20 @@ kubectl delete routedinterface r1e1ip
 
 ---
 
-### Or apply all the configuration from examples
+## Apply full configuration from examples
 
 Example manifests are available in the
 [`examples/`](https://github.com/mbakalarski/netclab-xp/tree/main/examples) directory.
 
-- Clone the repo and apply
+### Apply all:
+
 ```bash
-git clone https://github.com/mbakalarski/netclab-xp ; cd netclab-xp
+git clone https://github.com/mbakalarski/netclab-xp
+cd netclab-xp
 kubectl apply -f examples/eos/
 ```
 
-- Check if all are SYNCED and READY:
+### Verify SYNCED and READY:
 
 ```bash
 kubectl get netclab
@@ -248,7 +261,7 @@ kubectl get netclab
 
 Example output:
 
-```
+```bash
 NAME                               NODE-PORT                               ASN     ROUTER-ID   SYNCED   READY   COMPOSITION                  AGE
 bgpglobal.eos.netclab.dev/ceos01   ceos01.default.svc.cluster.local:6020   65001   10.0.0.1    True     True    bgpglobals.eos.netclab.dev   22s
 bgpglobal.eos.netclab.dev/ceos02   ceos02.default.svc.cluster.local:6020   65002   10.0.0.2    True     True    bgpglobals.eos.netclab.dev   22s
@@ -272,7 +285,7 @@ routedinterface.eos.netclab.dev/ceos02e1      ceos02.default.svc.cluster.local:6
 routedinterface.eos.netclab.dev/ceos02lo0ip   ceos02.default.svc.cluster.local:6020   Loopback0   10.0.0.2       32            True     True    routedinterfaces.eos.netclab.dev   22s
 ```
 
-On the router:
+### Check BGP on the router:
 
 ```bash
 kubectl exec ceos01 -- Cli -p15 -c "show ip bgp summary"
@@ -283,10 +296,10 @@ BGP summary information for VRF default
 Router identifier 10.0.0.1, local AS number 65001
 Neighbor Status Codes: m - Under maintenance
   Neighbor V AS           MsgRcvd   MsgSent  InQ OutQ  Up/Down State   PfxRcd PfxAcc PfxAdv
-  10.1.2.2 4 65002              5         5    0    0 00:01:13 Estab   0      0      0
+  10.1.2.2 4 65002              4         4    0    0 00:00:05 Estab   0      0      0
 ```
 
-- Remove configuration
+### Remove all configuration:
 
 ```bash
 kubectl delete -f examples/eos/
