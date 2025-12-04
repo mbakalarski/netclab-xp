@@ -10,7 +10,7 @@ spec:
   pipeline:
   - step: create-request
     functionRef:
-      name: function-go-templating
+      name: crossplane-contrib-function-go-templating
     input:
       apiVersion: gotemplating.fn.crossplane.io/v1beta1
       kind: GoTemplate
@@ -72,4 +72,4 @@ spec:
 
   - step: auto-ready
     functionRef:
-      name: function-auto-ready
+      name: crossplane-contrib-function-auto-ready
