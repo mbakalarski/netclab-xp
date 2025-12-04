@@ -79,7 +79,8 @@ This approach enables:
 
 #### 1. Install [`netclab-chart`](https://github.com/mbakalarski/netclab-chart)
 
-This provides the KinD cluster and tooling.
+Make sure you have downloaded the cEOS image from Arista Networks and imported it into your cluster.
+
 
 #### 2. Install Crossplane
 
