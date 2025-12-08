@@ -101,7 +101,7 @@ kind: Configuration
 metadata:
   name: netclab-xp
 spec:
-  package: xpkg.upbound.io/netclab/netclab-xp:v0.1.1
+  package: xpkg.upbound.io/netclab/netclab-xp:v0.1.2
 EOF
 ```
 
