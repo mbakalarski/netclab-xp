@@ -17,7 +17,7 @@ It provides a layered abstraction over device-specific RESTCONF/YANG models, all
 ```
 FabricIP / Evpn
      ↓
-EosRouter
+Router
      ↓
 Loopback / RoutedInterface / BgpGlobal / BgpNeighbor
      ↓
@@ -25,7 +25,7 @@ provider-http (RESTCONF)
 ```
 
 * **High-Level Services:** Vendor-neutral abstractions such as `FabricIP` and `EvpnService`.
-* **Mid-Level Abstractions:** Router constructs composed from multiple low-level XRDs (`EosRouter`).
+* **Mid-Level Abstractions:** Router constructs composed from multiple low-level XRDs (`Router`).
 * **Low-Level XRDs:** Vendor-specific resources directly representing YANG models (e.g., `RoutedInterface`, `BgpNeighbor`).
 * **Lowest Layer:** Raw RESTCONF operations via `provider-http`.
 

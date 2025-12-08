@@ -1,11 +1,11 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: eosrouter.eos.netclab.dev
+  name: router.eos.netclab.dev
 spec:
   compositeTypeRef:
     apiVersion: eos.netclab.dev/v1alpha1
-    kind: EosRouter
+    kind: Router
   mode: Pipeline
   pipeline:
   - step: render-router

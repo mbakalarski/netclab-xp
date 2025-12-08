@@ -1,0 +1,79 @@
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: routers.eos.netclab.dev
+spec:
+  scope: Cluster
+  group: eos.netclab.dev
+  names:
+    kind: Router
+    plural: routers
+    categories:
+    - crossplane
+    - netclab
+
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    additionalPrinterColumns:
+    - name: NODE-PORT
+      type: string
+      jsonPath: .spec.nodePort
+    - name: ASN
+      type: integer
+      jsonPath: .spec.asn
+    - name: ROUTER-ID
+      type: string
+      jsonPath: .spec.routerId
+
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              nodePort:
+                type: string
+              creds:
+                type: string
+              asn:
+                type: integer
+              routerId:
+                type: string
+              routedInterfaces:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    ipv4Address:
+                      type: string
+                    ipv4Prefix:
+                      type: integer
+                  required:
+                  - name
+                  - ipv4Address
+                  - ipv4Prefix
+              bgpNeighbors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    networkInstance:
+                      type: string
+                    neighborAsn:
+                      type: integer
+                    neighborIp:
+                      type: string
+                  required:
+                  - networkInstance
+                  - neighborAsn
+                  - neighborIp
+            required:
+            - nodePort
+            - creds
+            - asn
+            - routerId
