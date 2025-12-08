@@ -1,5 +1,5 @@
 apiVersion: eos.netclab.dev/v1alpha1
-kind: EosRouter
+kind: Router
 metadata:
   name: ceos01
 spec:

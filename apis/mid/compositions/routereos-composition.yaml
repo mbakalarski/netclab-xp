@@ -1,0 +1,92 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: router.eos.netclab.dev
+spec:
+  compositeTypeRef:
+    apiVersion: eos.netclab.dev/v1alpha1
+    kind: Router
+  mode: Pipeline
+  pipeline:
+  - step: render-router
+    functionRef:
+      name: crossplane-contrib-function-go-templating
+    input:
+      apiVersion: gotemplating.fn.crossplane.io/v1beta1
+      kind: GoTemplate
+      source: Inline
+      inline:
+        template: |
+          apiVersion: eos.netclab.dev/v1alpha1
+          kind: LoopbackInterface
+          metadata:
+            annotations:
+              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-lo0
+          spec:
+            nodePort: {{ .observed.composite.resource.spec.nodePort }}
+            creds: {{ .observed.composite.resource.spec.creds }}
+            name: Loopback0
+          ---
+          apiVersion: eos.netclab.dev/v1alpha1
+          kind: RoutedInterface
+          metadata:
+            annotations:
+              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-lo0-ip
+          spec:
+            nodePort: {{ .observed.composite.resource.spec.nodePort }}
+            creds: {{ .observed.composite.resource.spec.creds }}
+            name: Loopback0
+            ipv4Address: "{{ .observed.composite.resource.spec.routerId }}"
+            ipv4Prefix: 32
+          ---
+          apiVersion: eos.netclab.dev/v1alpha1
+          kind: BgpGlobal
+          metadata:
+            annotations:
+              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-bgp
+          spec:
+            nodePort: {{ .observed.composite.resource.spec.nodePort }}
+            creds: {{ .observed.composite.resource.spec.creds }}
+            asn: {{ int .observed.composite.resource.spec.asn }}
+            routerId: "{{ .observed.composite.resource.spec.routerId }}"
+          ---
+          apiVersion: eos.netclab.dev/v1alpha1
+          kind: IpRouting
+          metadata:
+            annotations:
+              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-routing
+          spec:
+            nodePort: {{ .observed.composite.resource.spec.nodePort }}
+            creds: {{ .observed.composite.resource.spec.creds }}
+          {{- range .observed.composite.resource.spec.routedInterfaces }}
+          ---
+          apiVersion: eos.netclab.dev/v1alpha1
+          kind: RoutedInterface
+          metadata:
+            annotations:
+              gotemplating.fn.crossplane.io/composition-resource-name: {{ $.observed.composite.resource.metadata.name }}-{{ .name }}
+          spec:
+            nodePort: {{ $.observed.composite.resource.spec.nodePort }}
+            creds: {{ $.observed.composite.resource.spec.creds }}
+            name: {{ .name }}
+            ipv4Address: "{{ .ipv4Address }}"
+            ipv4Prefix: {{ .ipv4Prefix }}
+          {{- end }}
+          {{- range .observed.composite.resource.spec.bgpNeighbors }}
+          ---
+          apiVersion: eos.netclab.dev/v1alpha1
+          kind: BgpNeighbor
+          metadata:
+            annotations:
+              gotemplating.fn.crossplane.io/composition-resource-name: {{ $.observed.composite.resource.metadata.name }}-{{ .neighborIp }}
+          spec:
+            nodePort: {{ $.observed.composite.resource.spec.nodePort }}
+            creds: {{ $.observed.composite.resource.spec.creds }}
+            networkInstance: {{ .networkInstance }}
+            neighborAsn: {{ int .neighborAsn }}
+            neighborIp: "{{ .neighborIp }}"
+          {{- end }}
+
+  - step: auto-ready
+    functionRef:
+      name: crossplane-contrib-function-auto-ready

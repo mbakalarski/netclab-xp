@@ -17,7 +17,7 @@ It provides a layered abstraction over device-specific RESTCONF/YANG models, all
 ```
 FabricIP / Evpn
      ↓
-EosRouter
+Router (eos)
      ↓
 Loopback / RoutedInterface / BgpGlobal / BgpNeighbor
      ↓
@@ -25,7 +25,7 @@ provider-http (RESTCONF)
 ```
 
 * **High-Level Services:** Vendor-neutral abstractions such as `FabricIP` and `EvpnService`.
-* **Mid-Level Abstractions:** Router constructs composed from multiple low-level XRDs (`EosRouter`).
+* **Mid-Level Abstractions:** Router constructs composed from multiple low-level XRDs (`Router`).
 * **Low-Level XRDs:** Vendor-specific resources directly representing YANG models (e.g., `RoutedInterface`, `BgpNeighbor`).
 * **Lowest Layer:** Raw RESTCONF operations via `provider-http`.
 
@@ -101,7 +101,7 @@ kind: Configuration
 metadata:
   name: netclab-xp
 spec:
-  package: xpkg.upbound.io/netclab/netclab-xp:v0.1.1
+  package: xpkg.upbound.io/netclab/netclab-xp:v0.1.2
 EOF
 ```
 
@@ -169,7 +169,7 @@ topology:
 EOF
 ```
 
-### Check topology state
+### Check topology
 
 ```bash
 kubectl get pod
@@ -206,7 +206,7 @@ spec:
 EOF
 ```
 
-### Check resource state:
+### Check resource:
 
 ```bash
 kubectl get netclab
@@ -214,7 +214,7 @@ kubectl get netclab
 
 Example output:
 
-```
+```bash
 NAME                                     NODE-PORT                               NAME        IPV4-ADDRESS   IPV4-PREFIX   SYNCED   READY   COMPOSITION                        AGE
 routedinterface.eos.netclab.dev/r1e1ip   ceos01.default.svc.cluster.local:6020   Ethernet1   10.10.10.1     24            True     True    routedinterfaces.eos.netclab.dev   7s
 ```
@@ -222,15 +222,13 @@ routedinterface.eos.netclab.dev/r1e1ip   ceos01.default.svc.cluster.local:6020  
 ### Check device configuration:
 
 ```bash
-kubectl exec -ti ceos01 -- Cli
+kubectl exec ceos01 -- Cli -p15 -c "show run int Ethernet1"
 ```
 
 ```console
-ceos01>en
-ceos01#show run int Ethernet1
 interface Ethernet1
    no switchport
-   ip address 10.10.10.1/24
+   ip address 10.1.2.1/24
 ```
 
 ### Remove configuration
@@ -241,20 +239,46 @@ kubectl delete routedinterface r1e1ip
 
 ---
 
-## Apply full configuration from examples
+## Routers (eos)
 
-Example manifests are available in the
-[`examples/`](https://github.com/mbakalarski/netclab-xp/tree/main/examples) directory.
-
-### Apply all:
+### Apply configuration on ceos01:
 
 ```bash
-git clone https://github.com/mbakalarski/netclab-xp
-cd netclab-xp
-kubectl apply -f examples/eos/
+cat <<EOF | kubectl apply -f -
+apiVersion: eos.netclab.dev/v1alpha1
+kind: Router
+metadata:
+  name: ceos01
+spec:
+  nodePort: ceos01.default.svc.cluster.local:6020
+  creds: YXJpc3RhOmFyaXN0YQ==
+  asn: 65001
+  routerId: 10.0.0.1
+  routedInterfaces:
+  - name: Ethernet1
+    ipv4Address: 10.1.2.1
+    ipv4Prefix: 24
+  bgpNeighbors:
+  - networkInstance: default
+    neighborAsn: 65002
+    neighborIp: 10.1.2.2
+EOF
 ```
 
-### Verify SYNCED and READY:
+### Check resource:
+
+```bash
+kubectl get router ceos01
+```
+
+Example output:
+
+```bash
+NAME     NODE-PORT                               ASN     ROUTER-ID   SYNCED   READY   COMPOSITION              AGE
+ceos01   ceos01.default.svc.cluster.local:6020   65001   10.0.0.1    True     True    router.eos.netclab.dev   2m4s
+```
+
+### Verify all SYNCED and READY:
 
 ```bash
 kubectl get netclab
@@ -263,27 +287,62 @@ kubectl get netclab
 Example output:
 
 ```bash
-NAME                               NODE-PORT                               ASN     ROUTER-ID   SYNCED   READY   COMPOSITION                  AGE
-bgpglobal.eos.netclab.dev/ceos01   ceos01.default.svc.cluster.local:6020   65001   10.0.0.1    True     True    bgpglobals.eos.netclab.dev   22s
-bgpglobal.eos.netclab.dev/ceos02   ceos02.default.svc.cluster.local:6020   65002   10.0.0.2    True     True    bgpglobals.eos.netclab.dev   22s
+NAME                                            NODE-PORT                               ASN     ROUTER-ID   SYNCED   READY   COMPOSITION                  AGE
+bgpglobal.eos.netclab.dev/ceos01-2eedd4b1cab4   ceos01.default.svc.cluster.local:6020   65001   10.0.0.1    True     True    bgpglobals.eos.netclab.dev   3m52s
 
-NAME                                       NODE-PORT                               NI        REMOTE-AS   REMOTE-IP   SYNCED   READY   COMPOSITION                    AGE
-bgpneighbor.eos.netclab.dev/ceos01ceos02   ceos01.default.svc.cluster.local:6020   default   65002       10.1.2.2    True     False   bgpneighbors.eos.netclab.dev   22s
-bgpneighbor.eos.netclab.dev/ceos02ceos01   ceos02.default.svc.cluster.local:6020   default   65001       10.1.2.1    True     True    bgpneighbors.eos.netclab.dev   22s
+NAME                                              NODE-PORT                               NI        REMOTE-AS   REMOTE-IP   SYNCED   READY   COMPOSITION                    AGE
+bgpneighbor.eos.netclab.dev/ceos01-3e0f1822de8d   ceos01.default.svc.cluster.local:6020   default   65002       10.1.2.2    True     True    bgpneighbors.eos.netclab.dev   3m52s
 
-NAME                               NODE-PORT                               SYNCED   READY   COMPOSITION                  AGE
-iprouting.eos.netclab.dev/ceos01   ceos01.default.svc.cluster.local:6020   True     True    iproutings.eos.netclab.dev   22s
-iprouting.eos.netclab.dev/ceos02   ceos02.default.svc.cluster.local:6020   True     True    iproutings.eos.netclab.dev   22s
+NAME                                            NODE-PORT                               SYNCED   READY   COMPOSITION                  AGE
+iprouting.eos.netclab.dev/ceos01-8c1ecd5acc68   ceos01.default.svc.cluster.local:6020   True     True    iproutings.eos.netclab.dev   3m52s
 
-NAME                                          NODE-PORT                               NAME        SYNCED   READY   COMPOSITION                          AGE
-loopbackinterface.eos.netclab.dev/ceos01lo0   ceos01.default.svc.cluster.local:6020   Loopback0   True     True    loopbackinterfaces.eos.netclab.dev   22s
-loopbackinterface.eos.netclab.dev/ceos02lo0   ceos02.default.svc.cluster.local:6020   Loopback0   True     True    loopbackinterfaces.eos.netclab.dev   22s
+NAME                                                    NODE-PORT                               NAME        SYNCED   READY   COMPOSITION                          AGE
+loopbackinterface.eos.netclab.dev/ceos01-06a18fc6671a   ceos01.default.svc.cluster.local:6020   Loopback0   True     True    loopbackinterfaces.eos.netclab.dev   3m52s
 
-NAME                                          NODE-PORT                               NAME        IPV4-ADDRESS   IPV4-PREFIX   SYNCED   READY   COMPOSITION                        AGE
-routedinterface.eos.netclab.dev/ceos01e1      ceos01.default.svc.cluster.local:6020   Ethernet1   10.1.2.1       24            True     True    routedinterfaces.eos.netclab.dev   22s
-routedinterface.eos.netclab.dev/ceos01lo0ip   ceos01.default.svc.cluster.local:6020   Loopback0   10.0.0.1       32            True     True    routedinterfaces.eos.netclab.dev   22s
-routedinterface.eos.netclab.dev/ceos02e1      ceos02.default.svc.cluster.local:6020   Ethernet1   10.1.2.2       24            True     True    routedinterfaces.eos.netclab.dev   22s
-routedinterface.eos.netclab.dev/ceos02lo0ip   ceos02.default.svc.cluster.local:6020   Loopback0   10.0.0.2       32            True     True    routedinterfaces.eos.netclab.dev   22s
+NAME                                                  NODE-PORT                               NAME        IPV4-ADDRESS   IPV4-PREFIX   SYNCED   READY   COMPOSITION                        AGE
+routedinterface.eos.netclab.dev/ceos01-95e43dc583a0   ceos01.default.svc.cluster.local:6020   Ethernet1   10.1.2.1       24            True     True    routedinterfaces.eos.netclab.dev   3m52s
+routedinterface.eos.netclab.dev/ceos01-e2781936df2b   ceos01.default.svc.cluster.local:6020   Loopback0   10.0.0.1       32            True     True    routedinterfaces.eos.netclab.dev   3m52s
+
+NAME                            NODE-PORT                               ASN     ROUTER-ID   SYNCED   READY   COMPOSITION              AGE
+router.eos.netclab.dev/ceos01   ceos01.default.svc.cluster.local:6020   65001   10.0.0.1    True     True    router.eos.netclab.dev   3m52s
+```
+
+### Add ceos02:
+
+```bash
+cat <<EOF | kubectl apply -f -
+apiVersion: eos.netclab.dev/v1alpha1
+kind: Router
+metadata:
+  name: ceos02
+spec:
+  nodePort: ceos02.default.svc.cluster.local:6020
+  creds: YXJpc3RhOmFyaXN0YQ==
+  asn: 65002
+  routerId: 10.0.0.2
+  routedInterfaces:
+  - name: Ethernet1
+    ipv4Address: 10.1.2.2
+    ipv4Prefix: 24
+  bgpNeighbors:
+  - networkInstance: default
+    neighborAsn: 65001
+    neighborIp: 10.1.2.1
+EOF
+```
+
+### Check resources:
+
+```bash
+kubectl get routers
+```
+
+Example output:
+
+```bash
+NAME     NODE-PORT                               ASN     ROUTER-ID   SYNCED   READY   COMPOSITION              AGE
+ceos01   ceos01.default.svc.cluster.local:6020   65001   10.0.0.1    True     True    router.eos.netclab.dev   8m14s
+ceos02   ceos02.default.svc.cluster.local:6020   65002   10.0.0.2    True     True    router.eos.netclab.dev   35s
 ```
 
 ### Check BGP on the router:
@@ -297,13 +356,13 @@ BGP summary information for VRF default
 Router identifier 10.0.0.1, local AS number 65001
 Neighbor Status Codes: m - Under maintenance
   Neighbor V AS           MsgRcvd   MsgSent  InQ OutQ  Up/Down State   PfxRcd PfxAcc PfxAdv
-  10.1.2.2 4 65002              4         4    0    0 00:00:05 Estab   0      0      0
+  10.1.2.2 4 65002             12        16    0    0 00:01:11 Estab   0      0      0
 ```
 
 ### Remove all configuration:
 
 ```bash
-kubectl delete -f examples/eos/
+kubectl delete netclab --all
 ```
 
 ---

@@ -1,0 +1,17 @@
+apiVersion: eos.netclab.dev/v1alpha1
+kind: Router
+metadata:
+  name: ceos02
+spec:
+  nodePort: ceos02.default.svc.cluster.local:6020
+  creds: YXJpc3RhOmFyaXN0YQ==
+  asn: 65002
+  routerId: 10.0.0.2
+  routedInterfaces:
+  - name: Ethernet1
+    ipv4Address: 10.1.2.2
+    ipv4Prefix: 24
+  bgpNeighbors:
+  - networkInstance: default
+    neighborAsn: 65001
+    neighborIp: 10.1.2.1
