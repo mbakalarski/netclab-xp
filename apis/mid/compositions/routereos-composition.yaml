@@ -1,7 +1,7 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: router.eos.netclab.dev
+  name: routers.eos.netclab.dev
 spec:
   compositeTypeRef:
     apiVersion: eos.netclab.dev/v1alpha1
