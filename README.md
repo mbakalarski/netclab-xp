@@ -101,7 +101,7 @@ kind: Configuration
 metadata:
   name: netclab-xp
 spec:
-  package: xpkg.upbound.io/netclab/netclab-xp:v0.1.3
+  package: xpkg.upbound.io/netclab/netclab-xp:v0.1.4
 EOF
 ```
 
@@ -363,6 +363,10 @@ Neighbor Status Codes: m - Under maintenance
 
 ```bash
 kubectl delete netclab --all
+```
+
+```bash
+helm uninstall ceos
 ```
 
 ---
