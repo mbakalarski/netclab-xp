@@ -10,7 +10,7 @@ spec:
   routedInterfaces:
   - name: Ethernet1
     ipv4Address: 10.1.2.1
-    ipv4Prefix: 24
+    ipv4PrefixLength: 24
   bgpNeighbors:
   - networkInstance: default
     neighborAsn: 65002
