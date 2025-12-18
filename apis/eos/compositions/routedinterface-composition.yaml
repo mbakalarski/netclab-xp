@@ -40,7 +40,7 @@ spec:
                           {
                             "config": {
                               "ip": "{{ .observed.composite.resource.spec.ipv4Address }}",
-                              "prefix-length": {{ .observed.composite.resource.spec.ipv4Prefix }}
+                              "prefix-length": {{ .observed.composite.resource.spec.ipv4PrefixLength }}
                             },
                             "ip": "{{ .observed.composite.resource.spec.ipv4Address }}"
                           }
@@ -71,7 +71,7 @@ spec:
                 type: CUSTOM
                 logic: |
                   if .response.body."openconfig-if-ip:config".ip == "{{ .observed.composite.resource.spec.ipv4Address }}"
-                  and .response.body."openconfig-if-ip:config"."prefix-length" == {{ .observed.composite.resource.spec.ipv4Prefix }}
+                  and .response.body."openconfig-if-ip:config"."prefix-length" == {{ .observed.composite.resource.spec.ipv4PrefixLength }}
                   then true
                   else false
                   end

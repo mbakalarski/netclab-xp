@@ -51,12 +51,12 @@ spec:
                       type: string
                     ipv4Address:
                       type: string
-                    ipv4Prefix:
+                    ipv4PrefixLength:
                       type: integer
                   required:
                   - name
                   - ipv4Address
-                  - ipv4Prefix
+                  - ipv4PrefixLength
               bgpNeighbors:
                 type: array
                 items:

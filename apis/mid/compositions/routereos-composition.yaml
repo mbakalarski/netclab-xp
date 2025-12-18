@@ -37,7 +37,7 @@ spec:
             creds: {{ .observed.composite.resource.spec.creds }}
             name: Loopback0
             ipv4Address: "{{ .observed.composite.resource.spec.routerId }}"
-            ipv4Prefix: 32
+            ipv4PrefixLength: 32
           ---
           apiVersion: eos.netclab.dev/v1alpha1
           kind: BgpGlobal
@@ -70,7 +70,7 @@ spec:
             creds: {{ $.observed.composite.resource.spec.creds }}
             name: {{ .name }}
             ipv4Address: "{{ .ipv4Address }}"
-            ipv4Prefix: {{ .ipv4Prefix }}
+            ipv4PrefixLength: {{ .ipv4PrefixLength }}
           {{- end }}
           {{- range .observed.composite.resource.spec.bgpNeighbors }}
           ---

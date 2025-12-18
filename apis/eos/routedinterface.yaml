@@ -25,7 +25,7 @@ spec:
         jsonPath: .spec.ipv4Address
       - name: IPV4-PREFIX
         type: integer
-        jsonPath: .spec.ipv4Prefix
+        jsonPath: .spec.ipv4PrefixLength
       served: true
       referenceable: true
       schema:
@@ -43,11 +43,11 @@ spec:
                   type: string
                 ipv4Address:
                   type: string
-                ipv4Prefix:
+                ipv4PrefixLength:
                   type: integer
               required:
                 - nodePort
                 - creds
                 - name
                 - ipv4Address
-                - ipv4Prefix
+                - ipv4PrefixLength

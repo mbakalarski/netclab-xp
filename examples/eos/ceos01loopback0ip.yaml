@@ -7,4 +7,4 @@ spec:
   creds: YXJpc3RhOmFyaXN0YQ==
   name: Loopback0
   ipv4Address: 10.0.0.1
-  ipv4Prefix: 32
+  ipv4PrefixLength: 32
