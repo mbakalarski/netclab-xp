@@ -23,7 +23,7 @@ spec:
       - name: IPV4-ADDRESS
         type: string
         jsonPath: .spec.ipv4Address
-      - name: IPV4-PREFIX
+      - name: IPV4-PREFIX-LENGTH
         type: integer
         jsonPath: .spec.ipv4PrefixLength
       served: true
