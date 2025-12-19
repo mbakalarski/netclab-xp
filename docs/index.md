@@ -2,6 +2,8 @@
 marp: true
 theme: default
 author: Michal Bakalarski
+title: netclab-xp
+keywords: kubernetes,crossplane,networkautomation,cloudNative,yang,arista,restconf,infrastructure,controlplane,openconfig,iac,devops,gitops,netdevops,netclab,netclab-xp
 paginate: true
 backgroundColor: '#1E293B'  # dark slate
 color: '#F8FAFC'            # light text
