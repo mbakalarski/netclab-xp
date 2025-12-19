@@ -1,9 +1,10 @@
 ---
 marp: true
 theme: default
+author: Michal Bakalarski
 paginate: true
 backgroundColor: '#1E293B'  # dark slate
-color: '#F8FAFC'             # light text
+color: '#F8FAFC'            # light text
 ---
 
 # 🚀 Introducing [**netclab-xp**](https://github.com/mbakalarski/netclab-xp)
@@ -185,13 +186,13 @@ router.eos.netclab.dev/ceos01   ceos01.default.svc.cluster.local:6020   65001   
 
 ---
 
-# 🎯 Get Started
+# 🎯 Next Steps
 
+*GH Repo:*
 [https://github.com/mbakalarski/netclab-xp](https://github.com/mbakalarski/netclab-xp)
 
-- Try **examples** for Arista EOS / cEOS  
-- Integrate with your GitOps workflows  
-- Contribute & extend for other vendors  
+*Upbound Marketplace:*
+[https://marketplace.upbound.io/configurations/netclab/netclab-xp](https://marketplace.upbound.io/configurations/netclab/netclab-xp)
 
-<br><br>
-#Kubernetes #Crossplane #network-automation #cloud-native #yang #Arista #restconf #infrastructure #control-plane #OpenConfig #IaC #DevOps #GitOps #NetDevOps
+*Listed in Crossplane Adopters:*
+curl -s https://github.com/crossplane/crossplane/blob/main/ADOPTERS.md | grep -o -E 'github.com/[a-z]+/netclab-xp'
