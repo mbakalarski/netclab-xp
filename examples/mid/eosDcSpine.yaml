@@ -1,0 +1,91 @@
+apiVersion: eos.netclab.dev/v1alpha1
+kind: SpineRouter
+metadata:
+  name: ceos01
+spec:
+  nodePort: ceos01.default.svc.cluster.local:6020
+  creds: YXJpc3RhOmFyaXN0YQ==
+
+  #################
+  spanningTree:
+    mode: none
+
+  #################
+  bfd:
+    multihop:
+      interval: 300
+      minRx: 300
+      multiplier: 3
+
+  #################
+  routedInterfaces:
+  - name: Ethernet1
+    description: P2P_dc1-leaf1a_Ethernet1
+    shutdown: no
+    mtu: 1500
+    ipv4Address: 10.255.255.0
+    ipv4PrefixLength: 31
+    vrf: default
+
+  - name: Loopback0
+    description: ROUTER_ID
+    shutdown: no
+    ipv4Address: 10.255.0.1
+    ipv4PrefixLength: 32
+    vrf: default
+
+  #################
+  bgpGlobal:
+    asn: 65100
+    routerId: 10.255.0.1
+    defaultIpv4Unicast: no
+    maximumPaths: 4
+    ecmpMaximumPaths: 4
+    redistributeLoopbacks:
+    - Loopback0
+
+  #################
+  bgpPeerGroups:
+  - name: EVPN-OVERLAY-PEERS
+    networkInstance: default
+    nextHopUnchanged: yes
+    updateSourceInterface: Loopback0
+    bfd: yes
+    ebgpMultihop: 3
+    sendCommunity: yes
+    maximumRoutes: 0
+    addressFamily:
+    - name: evpn
+    members:
+    - neighborAsn: 65101
+      neighborIp: 10.255.0.3
+      description: dc1-leaf1a_Loopback0
+    - neighborAsn: 65101
+      neighborIp: 10.255.0.4
+      description: dc1-leaf1b_Loopback0
+    - neighborAsn: 65102
+      neighborIp: 10.255.0.5
+      description: ddc1-leaf2a_Loopback0
+    - neighborAsn: 65102
+      neighborIp: 10.255.0.6
+      description: dc1-leaf2b_Loopback0
+
+  - name: IPv4-UNDERLAY-PEERS
+    sendCommunity: yes
+    maximumRoutes: 12000
+    addressFamily:
+    - name: evpn
+    - name: ipv4
+    members:
+    - neighborAsn: 65101
+      neighborIp: 10.255.255.1
+      description: dc1-leaf1a_Ethernet1
+    - neighborAsn: 65101
+      neighborIp: 10.255.255.5
+      description: dc1-leaf1b_Ethernet1
+    - neighborAsn: 65102
+      neighborIp: 10.255.255.9
+      description: dc1-leaf2a_Ethernet1
+    - neighborAsn: 65102
+      neighborIp: 10.255.255.13
+      description: dc1-leaf2b_Ethernet1
