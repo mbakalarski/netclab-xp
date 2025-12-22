@@ -1,0 +1,170 @@
+topology:
+  name: single-dc-l3ls
+  description: https://avd.arista.com/5.7/ansible_collections/arista/avd/examples/single-dc-l3ls/index.html
+  networks:
+  - name: b1
+  - name: b2
+  - name: b3
+  - name: b4
+  - name: b5
+  - name: b6
+  - name: b7
+  - name: b8
+  - name: b9
+  - name: b10
+  - name: b11
+  - name: b12
+  - name: b13
+  - name: b14
+  - name: b15
+  - name: b16
+  - name: b17
+  - name: b18
+  - name: b19
+  - name: b20
+  - name: b21
+  - name: b22
+  nodes:
+  - name: dc1-spine1
+    type: ceos
+    memory: 2Gi
+    cpu: 1000m
+    interfaces:
+    - name: eth1
+      network: b1
+    - name: eth2
+      network: b2
+    - name: eth3
+      network: b5
+    - name: eth4
+      network: b6
+
+  - name: dc1-spine2
+    type: ceos
+    memory: 2Gi
+    cpu: 1000m
+    interfaces:
+    - name: eth1
+      network: b3
+    - name: eth2
+      network: b4
+    - name: eth3
+      network: b7
+    - name: eth4
+      network: b8
+
+  - name: dc1-leaf1a
+    type: ceos
+    memory: 2Gi
+    cpu: 1000m
+    interfaces:
+    - name: eth1
+      network: b1
+    - name: eth2
+      network: b3
+    - name: eth3
+      network: b9
+    - name: eth4
+      network: b10
+    - name: eth5
+      network: b13
+    - name: eth8
+      network: b11
+
+  - name: dc1-leaf1b
+    type: ceos
+    memory: 2Gi
+    cpu: 1000m
+    interfaces:
+    - name: eth1
+      network: b2
+    - name: eth2
+      network: b4
+    - name: eth3
+      network: b9
+    - name: eth4
+      network: b10
+    - name: eth5
+      network: b15
+    - name: eth8
+      network: b12
+
+  - name: dc1-leaf1c
+    type: ceos
+    memory: 2Gi
+    cpu: 1000m
+    interfaces:
+    - name: eth1
+      network: b11
+    - name: eth2
+      network: b12
+    - name: eth5
+      network: b14
+
+  - name: dc1-leaf2a
+    type: ceos
+    memory: 2Gi
+    cpu: 1000m
+    interfaces:
+    - name: eth1
+      network: b5
+    - name: eth2
+      network: b7
+    - name: eth3
+      network: b16
+    - name: eth4
+      network: b17
+    - name: eth5
+      network: b20
+    - name: eth8
+      network: b18
+
+  - name: dc1-leaf2b
+    type: ceos
+    memory: 2Gi
+    cpu: 1000m
+    interfaces:
+    - name: eth1
+      network: b6
+    - name: eth2
+      network: b8
+    - name: eth3
+      network: b16
+    - name: eth4
+      network: b17
+    - name: eth5
+      network: b22
+    - name: eth8
+      network: b19
+
+  - name: dc1-leaf2c
+    type: ceos
+    memory: 2Gi
+    cpu: 1000m
+    interfaces:
+    - name: eth1
+      network: b18
+    - name: eth2
+      network: b19
+    - name: eth5
+      network: b21
+
+  - name: dc1-leaf1-server1
+    type: linux
+    interfaces:
+    - name: eth1
+      network: b13
+    - name: eth2
+      network: b14
+    - name: eth3
+      network: b15
+
+  - name: dc1-leaf2-server1
+    type: linux
+    interfaces:
+    - name: eth1
+      network: b20
+    - name: eth2
+      network: b21
+    - name: eth3
+      network: b22
