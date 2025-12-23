@@ -3,7 +3,7 @@ marp: true
 theme: default
 author: Michal Bakalarski
 title: netclab-xp
-keywords: kubernetes,crossplane,networkautomation,cloudNative,yang,arista,restconf,infrastructure,controlplane,openconfig,iac,devops,gitops,netdevops,netclab,netclab-xp
+keywords: kubernetes,crossplane,networkautomation,cloudNative,yang,arista,restconf,infrastructure,controlplane,openconfig,json-rpc,iac,devops,gitops,netdevops,netclab,netclab-xp
 paginate: true
 backgroundColor: '#1E293B'  # dark slate
 color: '#F8FAFC'            # light text
@@ -20,9 +20,9 @@ Manage physical, virtual, and containerized routers *just like cloud resources* 
 <br>
 
 - **Declarative & GitOps-ready** → manage routers like cloud resources  
-- **OpenConfig foundation** → vendor differences handled automatically  
-- **RESTCONF support** → starting with Arista EOS / cEOS  
 - **Kubernetes-native state** → real-time reconciliation vs. Terraform  
+- **OpenConfig models when possible** → differences handled automatically  
+- **RESTCONF and JSON-RPC support** → starting with Arista EOS / cEOS  
 - **Fast onboarding** → add new routers or services easily
 
 ---
@@ -36,7 +36,7 @@ Manage physical, virtual, and containerized routers *just like cloud resources* 
       ▼  
 ***Low-Level XRDs*** <span style="color:#60A5FA">`Loopback` / `RoutedInterface` / `BgpGlobal` / `BgpNeighbor`</span>  
       ▼  
-***RESTCONF Provider*** <span style="color:#60A5FA">`provider-http`</span>
+***RESTCONF & JSON-RPC Provider*** <span style="color:#60A5FA">`provider-http`</span>
 
 ---
 
