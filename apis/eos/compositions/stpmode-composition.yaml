@@ -89,7 +89,7 @@ spec:
                       "cmds": [
                         "enable",
                         "configure",
-                        "spanning-tree mode none"
+                        "spanning-tree mode mstp"
                       ]
                     }
                   }
