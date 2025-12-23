@@ -6,7 +6,7 @@
 **Declarative Crossplane Configuration Package for Router Configuration Management**
 
 `netclab-xp` enables declarative, GitOps-driven lifecycle management of physical, virtualized, and containerized routers using Crossplane.
-It provides a layered abstraction over device-specific RESTCONF/YANG models, allowing network teams to manage router configuration consistently and reproducibly.
+It provides a layered abstractions, allowing network teams to manage router configuration consistently and reproducibly.
 
 ---
 
@@ -21,13 +21,13 @@ Router (eos)
      ↓
 Loopback / RoutedInterface / BgpGlobal / BgpNeighbor
      ↓
-provider-http (RESTCONF)
+provider-http (RESTCONF, JSON-RPC)
 ```
 
 * **High-Level Services:** Vendor-neutral abstractions such as `FabricIP` and `EvpnService`.
 * **Mid-Level Abstractions:** Router constructs composed from multiple low-level XRDs (`Router`).
 * **Low-Level XRDs:** Vendor-specific resources directly representing YANG models (e.g., `RoutedInterface`, `BgpNeighbor`).
-* **Lowest Layer:** Raw RESTCONF operations via `provider-http`.
+* **Lowest Layer:** Raw RESTCONF or JSON-RPC operations via `provider-http`.
 
 This model hides vendor-specific complexity while enabling reusable, declarative network configuration.
 
@@ -57,7 +57,7 @@ This approach enables:
 
 ## Supported Devices
 
-* **RESTCONF-enabled routers**
+* **RESTCONF- or JSON-RPC-enabled routers**
   *Currently supported:* Arista EOS
 
 * **Other vendors**
@@ -69,7 +69,7 @@ This approach enables:
 
 ### Requirements
 
-* RESTCONF access to target routers
+* Target routers
   (provided here via [`netclab-chart`](https://github.com/mbakalarski/netclab-chart))
 * A Kubernetes cluster with Crossplane installed
   (in this setup, the same cluster that runs the netclab-chart topology)
