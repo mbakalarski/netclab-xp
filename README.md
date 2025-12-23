@@ -12,7 +12,7 @@ It provides a layered abstractions, allowing network teams to manage router conf
 
 ## Overview
 
-`netclab-xp` is organized around a set of **layered abstractions**:
+`netclab-xp` is organized around a set of **layered abstractions**, for example:
 
 ```
 FabricIP / Evpn
@@ -26,22 +26,10 @@ provider-http (RESTCONF, JSON-RPC)
 
 * **High-Level Services:** Vendor-neutral abstractions such as `FabricIP` and `EvpnService`.
 * **Mid-Level Abstractions:** Router constructs composed from multiple low-level XRDs (`Router`).
-* **Low-Level XRDs:** Vendor-specific resources directly representing YANG models (e.g., `RoutedInterface`, `BgpNeighbor`).
+* **Low-Level XRDs:** Vendor-specific resources directly representing YANG models or configuration components (e.g., `RoutedInterface`, `BgpNeighbor`).
 * **Lowest Layer:** Raw RESTCONF or JSON-RPC operations via `provider-http`.
 
 This model hides vendor-specific complexity while enabling reusable, declarative network configuration.
-
----
-
-## OpenConfig-Based XRDs
-
-`netclab-xp` uses **OpenConfig** as the foundation for low-level XRD definitions.
-Because many vendors include **YANG augments**, the repository organizes these XRDs into vendor-specific directories and API groups.
-
-This approach enables:
-
-* A consistent OpenConfig-style abstraction
-* Support for vendor-specific extensions (BGP, interfaces, VLANs, EVPN, etc.)
 
 ---
 
@@ -376,9 +364,9 @@ helm uninstall ceos
 `netclab-xp` is designed to be extensible, and contributions are encouraged.
 You can help improve or extend the project by:
 
-* Adding new vendor-specific XRDs or OpenConfig extensions
+* Adding new vendor-specific XRDs
 * Creating high-level network abstractions (e.g., EVPN, fabric services)
-* Enhancing router compositions and automation functions
+* Enhancing router compositions
 * Contributing examples, tests, or documentation improvements
 * Fixing issues or proposing enhancements via pull requests
 
