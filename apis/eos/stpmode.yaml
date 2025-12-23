@@ -1,0 +1,41 @@
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: stpmodes.eos.netclab.dev
+spec:
+  scope: Cluster
+  group: eos.netclab.dev
+  names:
+    kind: StpMode
+    plural: stpmodes
+    categories:
+    - crossplane
+    - netclab
+  versions:
+  - name: v1alpha1
+    additionalPrinterColumns:
+    - name: TARGET
+      type: string
+      jsonPath: .spec.target
+    - name: STP
+      type: string
+      jsonPath: .spec.stpMode
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              target:
+                type: string
+              creds:
+                type: string
+              stpMode:
+                type: string
+            required:
+            - target
+            - creds
+            - stpMode
