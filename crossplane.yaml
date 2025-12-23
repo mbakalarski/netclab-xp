@@ -14,7 +14,7 @@ spec:
     - apiVersion: pkg.crossplane.io/v1
       kind: Provider
       package: xpkg.upbound.io/crossplane-contrib/provider-http
-      version: ">=v1.0.12"
+      version: "=v1.0.12"
 
     - apiVersion: pkg.crossplane.io/v1
       kind: Function
