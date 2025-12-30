@@ -35,6 +35,9 @@ spec:
                 type: string
               stpMode:
                 type: string
+                enum:
+                - mstp
+                - none
             required:
             - target
             - creds
