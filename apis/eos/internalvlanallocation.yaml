@@ -1,0 +1,61 @@
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: internalvlanallocations.eos.netclab.dev
+spec:
+  scope: Cluster
+  group: eos.netclab.dev
+  names:
+    kind: InternalVlanAllocation
+    plural: internalvlanallocations
+    categories:
+    - crossplane
+    - netclab
+  versions:
+  - name: v1alpha1
+    additionalPrinterColumns:
+    - name: TARGET
+      type: string
+      jsonPath: .spec.target
+    - name: ORDER
+      type: string
+      jsonPath: .spec.order
+    - name: START
+      type: integer
+      jsonPath: .spec.range.start
+    - name: END
+      type: integer
+      jsonPath: .spec.range.end
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              target:
+                type: string
+              creds:
+                type: string
+              order:
+                type: string
+                enum:
+                - ascending
+                - descending
+              range:
+                type: object
+                properties:
+                  start:
+                    type: integer
+                  end:
+                    type: integer
+                required:
+                - start
+                - end
+            required:
+            - target
+            - creds
+            - order
+            - range
