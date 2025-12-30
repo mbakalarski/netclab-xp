@@ -6,7 +6,6 @@ spec:
   nodePort: ceos01.default.svc.cluster.local:6020
   creds: YXJpc3RhOmFyaXN0YQ==
   networkInstance: default
-  #
   name: EVPN-OVERLAY-PEERS
   nextHopUnchanged: true
   updateSource: Loopback0
