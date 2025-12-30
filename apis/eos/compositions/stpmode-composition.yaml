@@ -1,0 +1,123 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: stpmodes.eos.netclab.dev
+spec:
+  compositeTypeRef:
+    apiVersion: eos.netclab.dev/v1alpha1
+    kind: StpMode
+  mode: Pipeline
+  pipeline:
+  - step: set-mode
+    functionRef:
+      name: crossplane-contrib-function-go-templating
+    input:
+      apiVersion: gotemplating.fn.crossplane.io/v1beta1
+      kind: GoTemplate
+      source: Inline
+      inline:
+        template: |
+          apiVersion: http.crossplane.io/v1alpha2
+          kind: Request
+          metadata:
+            annotations:
+              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-stpmode
+          spec:
+            forProvider:
+              insecureSkipTLSVerify: true
+              headers:
+                Accept: ["application/json"]
+                Authorization: ["Basic {{ .observed.composite.resource.spec.creds }}"]
+              payload:
+                baseUrl: "{{ .observed.composite.resource.spec.target }}/command-api"
+                body: |
+                  {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "runCmds",
+                    "params": {
+                      "version": 1,
+                      "format": "json",
+                      "cmds": [
+                        "enable",
+                        "configure",
+                        "spanning-tree mode {{ .observed.composite.resource.spec.stpMode }}"
+                      ]
+                    }
+                  }
+
+              mappings:
+              - action: CREATE
+                method: POST
+                body: .payload.body
+                url: .payload.baseUrl
+
+              - action: UPDATE
+                method: POST
+                body: .payload.body
+                url: .payload.baseUrl
+
+              - action: OBSERVE
+                method: POST
+                url: .payload.baseUrl
+                body: |
+                  {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "runCmds",
+                    "params": {
+                      "version": 1,
+                      "format": "json",
+                      "cmds": [
+                        "enable",
+                         "show spanning-tree"
+                      ]
+                    }
+                  }
+
+              - action: REMOVE
+                method: POST
+                url: .payload.baseUrl
+                body: |
+                  {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "runCmds",
+                    "params": {
+                      "version": 1,
+                      "format": "json",
+                      "cmds": [
+                        "enable",
+                        "configure",
+                        "spanning-tree mode mstp"
+                      ]
+                    }
+                  }
+
+              expectedResponseCheck:
+                type: CUSTOM
+                logic: |
+                  .response.body.error == null
+                  and
+                  (
+                    (
+                      "{{ .observed.composite.resource.spec.stpMode }}" == "none"
+                      and .response.body.result[1].spanningTreeInstances == {}
+                    )
+                    or
+                    (
+                      "{{ .observed.composite.resource.spec.stpMode }}" == "mstp"
+                      and .response.body.result[1].spanningTreeInstances.MST0.protocol == "mstp"
+                    )
+                  )
+
+              isRemovedCheck:
+                type: CUSTOM
+                logic: |
+                  .response.body.error == null
+                  and .response.body.result[1].spanningTreeInstances.MST0.protocol == "mstp"
+
+
+  - step: auto-ready
+    functionRef:
+      name: crossplane-contrib-function-auto-ready

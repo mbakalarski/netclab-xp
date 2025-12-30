@@ -1,0 +1,8 @@
+apiVersion: eos.netclab.dev/v1alpha1
+kind: StpMode
+metadata:
+  name: ceos01
+spec:
+  target: http://ceos01.default.svc.cluster.local:6021
+  creds: YXJpc3RhOmFyaXN0YQ==
+  stpMode: none
