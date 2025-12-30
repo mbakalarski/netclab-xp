@@ -1,13 +1,13 @@
 apiVersion: apiextensions.crossplane.io/v2
 kind: CompositeResourceDefinition
 metadata:
-  name: internalvlanallocations.eos.netclab.dev
+  name: vlaninternalallocations.eos.netclab.dev
 spec:
   scope: Cluster
   group: eos.netclab.dev
   names:
-    kind: InternalVlanAllocation
-    plural: internalvlanallocations
+    kind: VlanInternalAllocation
+    plural: vlaninternalallocations
     categories:
     - crossplane
     - netclab
