@@ -83,3 +83,4 @@ spec:
                 - nodePort
                 - creds
                 - networkInstance
+                - name
