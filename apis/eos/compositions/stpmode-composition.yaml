@@ -97,18 +97,25 @@ spec:
               expectedResponseCheck:
                 type: CUSTOM
                 logic: |
-                  if .response.statusCode == 200
-                  then true
-                  else false
-                  end
+                  .response.body.error == null
+                  and
+                  (
+                    (
+                      "{{ .observed.composite.resource.spec.stpMode }}" == "none"
+                      and .response.body.result[1].spanningTreeInstances == {}
+                    )
+                    or
+                    (
+                      "{{ .observed.composite.resource.spec.stpMode }}" == "mstp"
+                      and .response.body.result[1].spanningTreeInstances.MST0.protocol == "mstp"
+                    )
+                  )
 
               isRemovedCheck:
                 type: CUSTOM
                 logic: |
-                  if .response.statusCode == 200
-                  then true
-                  else false
-                  end
+                  .response.body.error == null
+                  and .response.body.result[1].spanningTreeInstances.MST0.protocol == "mstp"
 
 
   - step: auto-ready
