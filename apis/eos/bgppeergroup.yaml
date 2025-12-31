@@ -12,75 +12,68 @@ spec:
     - crossplane
     - netclab
   versions:
-    - name: v1alpha1
-      additionalPrinterColumns:
-      - name: NODE-PORT
-        type: string
-        jsonPath: .spec.nodePort
-
-      - name: NI
-        type: string
-        jsonPath: .spec.networkInstance
-      - name: PEER-GROUP
-        type: string
-        jsonPath: .spec.name
-      - name: NH-UNCH
-        type: boolean
-        jsonPath: .spec.nextHopUnchanged
-      - name: SRC-INT
-        type: string
-        jsonPath: .spec.updateSource
-      - name: BFD
-        type: boolean
-        jsonPath: .spec.bfd
-      - name: EBGP-TTL
-        type: integer
-        jsonPath: .spec.ebgpMultihop
-      - name: SND-COMM
-        type: array
-        jsonPath: .spec.sendCommunityTypes
-      - name: MAX-PFX
-        type: integer
-        jsonPath: .spec.maximumRoutes
-
-      served: true
-      referenceable: true
-      schema:
-        openAPIV3Schema:
-          type: object
-          properties:
-            spec:
-              type: object
-              properties:
-                nodePort:
+  - name: v1alpha1
+    additionalPrinterColumns:
+    - name: NODE
+      type: string
+      jsonPath: .spec.nodePort
+    - name: VRF
+      type: string
+      jsonPath: .spec.networkInstance
+    - name: PG
+      type: string
+      jsonPath: .spec.name
+    - name: NHU
+      type: boolean
+      jsonPath: .spec.nextHopUnchanged
+    - name: SRCIF
+      type: string
+      jsonPath: .spec.updateSource
+    - name: BFD
+      type: boolean
+      jsonPath: .spec.bfd
+    - name: EMH
+      type: integer
+      jsonPath: .spec.ebgpMultihop
+    - name: MAXRT
+      type: integer
+      jsonPath: .spec.maximumRoutes
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              nodePort:
+                type: string
+              creds:
+                type: string
+              networkInstance:
+                type: string
+              name:
+                type: string
+              nextHopUnchanged:
+                type: boolean
+              updateSource:
+                type: string
+              bfd:
+                type: boolean
+              ebgpMultihop:
+                type: integer
+              sendCommunityTypes:
+                type: array
+                items:
                   type: string
-                creds:
-                  type: string
-                networkInstance:
-                  type: string
-
-                name:
-                  type: string
-                nextHopUnchanged:
-                  type: boolean
-                updateSource:
-                  type: string
-                bfd:
-                  type: boolean
-                ebgpMultihop:
-                  type: integer
-                sendCommunityTypes:
-                  type: array
-                  items:
-                    type: string
-                    enum:
-                    - EXTENDED
-                    - STANDARD
-                maximumRoutes:
-                  type: integer
-
-              required:
-                - nodePort
-                - creds
-                - networkInstance
-                - name
+                  enum:
+                  - EXTENDED
+                  - STANDARD
+              maximumRoutes:
+                type: integer
+            required:
+            - nodePort
+            - creds
+            - networkInstance
+            - name

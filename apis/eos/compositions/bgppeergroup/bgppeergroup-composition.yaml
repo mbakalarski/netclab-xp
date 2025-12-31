@@ -1,0 +1,94 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: bgppeergroups.eos.netclab.dev
+spec:
+  compositeTypeRef:
+    apiVersion: eos.netclab.dev/v1alpha1
+    kind: BgpPeerGroup
+  mode: Pipeline
+  pipeline:
+  - step: create-request
+    functionRef:
+      name: crossplane-contrib-function-go-templating
+    input:
+      apiVersion: gotemplating.fn.crossplane.io/v1beta1
+      kind: GoTemplate
+      source: Inline
+      inline:
+        template: |
+          apiVersion: http.crossplane.io/v1alpha2
+          kind: Request
+          metadata:
+            annotations:
+              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}
+          spec:
+            forProvider:
+              insecureSkipTLSVerify: true
+              headers:
+                Accept: ["application/yang-data+json"]
+                Authorization: ["Basic {{ .observed.composite.resource.spec.creds }}"]
+              payload:
+                baseUrl: "https://{{ .observed.composite.resource.spec.nodePort }}/restconf/data/openconfig-network-instance:network-instances/network-instance=default/protocols/protocol=BGP,BGP/bgp/peer-groups/peer-group={{ .observed.composite.resource.spec.name }}"
+                body: |
+                  {}
+
+              mappings:
+              - action: CREATE
+                method: PATCH
+                url: .payload.baseUrl + "/config"
+                body: .payload.body
+
+              - action: UPDATE
+                method: PATCH
+                url: .payload.baseUrl + "/config"
+                body: .payload.body
+
+              - action: OBSERVE
+                url: .payload.baseUrl
+
+              - action: REMOVE
+                method: DELETE
+                url: .payload.baseUrl
+
+          {{- if hasKey .observed.composite.resource.spec "nextHopUnchanged" }}
+          ---
+          apiVersion: http.crossplane.io/v1alpha2
+          kind: Request
+          metadata:
+            annotations:
+              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-nhu
+          spec:
+            forProvider:
+              insecureSkipTLSVerify: true
+              headers:
+                Accept: ["application/yang-data+json"]
+                Authorization: ["Basic {{ .observed.composite.resource.spec.creds }}"]
+              payload:
+                baseUrl: "https://{{ .observed.composite.resource.spec.nodePort }}/restconf/data/openconfig-network-instance:network-instances/network-instance=default/protocols/protocol=BGP,BGP/bgp/peer-groups/peer-group={{ .observed.composite.resource.spec.name }}"
+                body: |
+                  { "arista-exp-eos-bgp:next-hop-unchanged": {{ .observed.composite.resource.spec.nextHopUnchanged }} }
+
+              mappings:
+              - action: CREATE
+                method: PATCH
+                url: .payload.baseUrl + "/config"
+                body: .payload.body
+
+              - action: UPDATE
+                method: PATCH
+                url: .payload.baseUrl + "/config"
+                body: .payload.body
+
+              - action: OBSERVE
+                url: .payload.baseUrl + "config/arista-exp-eos-bgp:next-hop-unchanged"
+
+              - action: REMOVE
+                method: DELETE
+                url: .payload.baseUrl
+          {{- end }}
+
+
+  - step: auto-ready
+    functionRef:
+      name: crossplane-contrib-function-auto-ready
