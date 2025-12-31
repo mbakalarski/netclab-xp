@@ -81,7 +81,7 @@ spec:
                 body: .payload.body
 
               - action: OBSERVE
-                url: .payload.baseUrl + "config/arista-exp-eos-bgp:next-hop-unchanged"
+                url: .payload.baseUrl + "/config/arista-exp-eos-bgp:next-hop-unchanged"
 
               - action: REMOVE
                 method: DELETE
