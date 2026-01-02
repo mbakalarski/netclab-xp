@@ -11,7 +11,7 @@ spec:
   updateSource: Loopback0
   bfd: true
   ebgpMultihop: 3
+  maximumRoutes: 0
   sendCommunityTypes:
   - EXTENDED
   - STANDARD
-  maximumRoutes: 0
