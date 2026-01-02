@@ -244,6 +244,50 @@ spec:
                 url: .payload.baseUrl
           {{- end }}
 
+          {{- if hasKey .observed.composite.resource.spec "sendCommunityTypes" }}
+          ---
+          apiVersion: http.crossplane.io/v1alpha2
+          kind: Request
+          metadata:
+            annotations:
+              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-sendcommunitytypes
+          spec:
+            forProvider:
+              insecureSkipTLSVerify: true
+              headers:
+                Accept: ["application/yang-data+json"]
+                Authorization: ["Basic {{ .observed.composite.resource.spec.creds }}"]
+              payload:
+                baseUrl: "https://{{ .observed.composite.resource.spec.nodePort }}/restconf/data/openconfig-network-instance:network-instances/network-instance=default/protocols/protocol=BGP,BGP/bgp/peer-groups/peer-group={{ .observed.composite.resource.spec.name }}/config"
+                body: |
+                  {
+                    "openconfig-network-instance:send-community-type":
+                      [
+                        {{- range $i, $v := .observed.composite.resource.spec.sendCommunityTypes }}
+                          {{- if $i }},{{ end }}"{{ $v }}"
+                        {{- end }}
+                      ]
+                  }
+
+              mappings:
+              - action: CREATE
+                method: PATCH
+                url: .payload.baseUrl
+                body: .payload.body
+
+              - action: UPDATE
+                method: PUT
+                url: .payload.baseUrl
+                body: .payload.body
+
+              - action: OBSERVE
+                url: .payload.baseUrl + "/send-community-type"
+
+              - action: REMOVE
+                method: DELETE
+                url: .payload.baseUrl + "/send-community-type"
+          {{- end }}
+
 
   - step: auto-ready
     functionRef:
