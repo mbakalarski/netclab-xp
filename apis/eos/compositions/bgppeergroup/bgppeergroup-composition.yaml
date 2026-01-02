@@ -125,7 +125,7 @@ spec:
                 url: .payload.baseUrl + "/local-address"
           {{- end }}
 
-          {{- if hasKey .observed.composite.resource.spec "bfd" }}
+          {{- if and (hasKey .observed.composite.resource.spec "bfd") .observed.composite.resource.spec.bfd }}
           ---
           apiVersion: http.crossplane.io/v1alpha2
           kind: Request

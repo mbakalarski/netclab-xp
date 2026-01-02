@@ -61,6 +61,8 @@ spec:
                 type: string
               bfd:
                 type: boolean
+                enum:
+                - true
               ebgpMultihop:
                 type: integer
               sendCommunityTypes:
