@@ -207,6 +207,43 @@ spec:
                   .response.statusCode == 404
           {{- end }}
 
+          {{- if hasKey .observed.composite.resource.spec "maximumRoutes" }}
+          ---
+          apiVersion: http.crossplane.io/v1alpha2
+          kind: Request
+          metadata:
+            annotations:
+              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-maximumroutes
+          spec:
+            forProvider:
+              insecureSkipTLSVerify: true
+              headers:
+                Accept: ["application/yang-data+json"]
+                Authorization: ["Basic {{ .observed.composite.resource.spec.creds }}"]
+              payload:
+                baseUrl: "https://{{ .observed.composite.resource.spec.nodePort }}/restconf/data/openconfig-network-instance:network-instances/network-instance=default/protocols/protocol=BGP,BGP/bgp/peer-groups/peer-group={{ .observed.composite.resource.spec.name }}/arista-bgp-augments:prefix-limit/config"
+                body: |
+                  { "arista-bgp-augments:max-prefixes": {{ .observed.composite.resource.spec.maximumRoutes }} }
+
+              mappings:
+              - action: CREATE
+                method: PATCH
+                url: .payload.baseUrl
+                body: .payload.body
+
+              - action: UPDATE
+                method: PATCH
+                url: .payload.baseUrl
+                body: .payload.body
+
+              - action: OBSERVE
+                url: .payload.baseUrl + "/arista-bgp-augments:max-prefixes"
+
+              - action: REMOVE
+                method: DELETE
+                url: .payload.baseUrl
+          {{- end }}
+
 
   - step: auto-ready
     functionRef:

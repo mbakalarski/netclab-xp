@@ -76,6 +76,7 @@ spec:
                   - STANDARD
               maximumRoutes:
                 type: integer
+                minimum: 0
             required:
             - nodePort
             - creds
