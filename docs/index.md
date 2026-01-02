@@ -193,7 +193,7 @@ router.eos.netclab.dev/ceos01   ceos01.default.svc.cluster.local:6020   65001   
 *GH Repo:*
 [https://github.com/mbakalarski/netclab-xp](https://github.com/mbakalarski/netclab-xp)
 
-*Upbound Marketplace:*
+*OCI Registry:*
 [https://marketplace.upbound.io/configurations/netclab/netclab-xp](https://marketplace.upbound.io/configurations/netclab/netclab-xp)
 
 *Listed in Crossplane Adopters:*
