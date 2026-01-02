@@ -16,7 +16,7 @@ spec:
     additionalPrinterColumns:
     - name: TARGET
       type: string
-      jsonPath: .spec.target
+      jsonPath: .spec.deviceUrl
     - name: ORDER
       type: string
       jsonPath: .spec.order
@@ -35,7 +35,7 @@ spec:
           spec:
             type: object
             properties:
-              target:
+              deviceUrl:
                 type: string
               creds:
                 type: string
@@ -55,7 +55,7 @@ spec:
                 - start
                 - end
             required:
-            - target
+            - deviceUrl
             - creds
             - order
             - range

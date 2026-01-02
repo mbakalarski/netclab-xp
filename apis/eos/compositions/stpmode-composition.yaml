@@ -29,7 +29,7 @@ spec:
                 Accept: ["application/json"]
                 Authorization: ["Basic {{ .observed.composite.resource.spec.creds }}"]
               payload:
-                baseUrl: "{{ .observed.composite.resource.spec.target }}/command-api"
+                baseUrl: "{{ .observed.composite.resource.spec.deviceUrl }}/command-api"
                 body: |
                   {
                     "jsonrpc": "2.0",

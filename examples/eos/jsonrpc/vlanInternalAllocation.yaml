@@ -3,7 +3,7 @@ kind: VlanInternalAllocation
 metadata:
   name: ceos01
 spec:
-  target: http://ceos01.default.svc.cluster.local:6021
+  deviceUrl: http://ceos01.default.svc.cluster.local:6021
   creds: YXJpc3RhOmFyaXN0YQ==
   order: ascending
   range:
