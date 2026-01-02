@@ -29,7 +29,7 @@ spec:
                 Accept: ["application/yang-data+json"]
                 Authorization: ["Basic {{ .observed.composite.resource.spec.creds }}"]
               payload:
-                baseUrl: "https://{{ .observed.composite.resource.spec.nodePort }}/restconf/data/openconfig-interfaces:interfaces/interface={{ .observed.composite.resource.spec.name }}"
+                baseUrl: "{{ .observed.composite.resource.spec.deviceUrl }}/restconf/data/openconfig-interfaces:interfaces/interface={{ .observed.composite.resource.spec.name }}"
                 body: |
                   { "config": { "enabled": true } }
 

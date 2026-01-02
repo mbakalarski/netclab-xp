@@ -3,7 +3,7 @@ kind: BgpNeighbor
 metadata:
   name: ceos02ceos01
 spec:
-  nodePort: ceos02.default.svc.cluster.local:6020
+  deviceUrl: https://ceos02.default.svc.cluster.local:6020
   creds: YXJpc3RhOmFyaXN0YQ==
   networkInstance: default
   neighborAsn: 65001

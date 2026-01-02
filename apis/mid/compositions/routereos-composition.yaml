@@ -23,7 +23,7 @@ spec:
             annotations:
               gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-lo0
           spec:
-            nodePort: {{ .observed.composite.resource.spec.nodePort }}
+            deviceUrl: {{ .observed.composite.resource.spec.deviceUrl }}
             creds: {{ .observed.composite.resource.spec.creds }}
             name: Loopback0
           ---
@@ -33,7 +33,7 @@ spec:
             annotations:
               gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-lo0-ip
           spec:
-            nodePort: {{ .observed.composite.resource.spec.nodePort }}
+            deviceUrl: {{ .observed.composite.resource.spec.deviceUrl }}
             creds: {{ .observed.composite.resource.spec.creds }}
             name: Loopback0
             ipv4Address: "{{ .observed.composite.resource.spec.routerId }}"
@@ -45,7 +45,7 @@ spec:
             annotations:
               gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-bgp
           spec:
-            nodePort: {{ .observed.composite.resource.spec.nodePort }}
+            deviceUrl: {{ .observed.composite.resource.spec.deviceUrl }}
             creds: {{ .observed.composite.resource.spec.creds }}
             asn: {{ int .observed.composite.resource.spec.asn }}
             routerId: "{{ .observed.composite.resource.spec.routerId }}"
@@ -56,7 +56,7 @@ spec:
             annotations:
               gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-routing
           spec:
-            nodePort: {{ .observed.composite.resource.spec.nodePort }}
+            deviceUrl: {{ .observed.composite.resource.spec.deviceUrl }}
             creds: {{ .observed.composite.resource.spec.creds }}
           {{- range .observed.composite.resource.spec.routedInterfaces }}
           ---
@@ -66,7 +66,7 @@ spec:
             annotations:
               gotemplating.fn.crossplane.io/composition-resource-name: {{ $.observed.composite.resource.metadata.name }}-{{ .name }}
           spec:
-            nodePort: {{ $.observed.composite.resource.spec.nodePort }}
+            deviceUrl: {{ $.observed.composite.resource.spec.deviceUrl }}
             creds: {{ $.observed.composite.resource.spec.creds }}
             name: {{ .name }}
             ipv4Address: "{{ .ipv4Address }}"
@@ -80,7 +80,7 @@ spec:
             annotations:
               gotemplating.fn.crossplane.io/composition-resource-name: {{ $.observed.composite.resource.metadata.name }}-{{ .neighborIp }}
           spec:
-            nodePort: {{ $.observed.composite.resource.spec.nodePort }}
+            deviceUrl: {{ $.observed.composite.resource.spec.deviceUrl }}
             creds: {{ $.observed.composite.resource.spec.creds }}
             networkInstance: {{ .networkInstance }}
             neighborAsn: {{ int .neighborAsn }}

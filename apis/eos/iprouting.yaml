@@ -14,9 +14,9 @@ spec:
   versions:
     - name: v1alpha1
       additionalPrinterColumns:
-      - name: NODE-PORT
+      - name: DEVICE-URL
         type: string
-        jsonPath: .spec.nodePort
+        jsonPath: .spec.deviceUrl
       served: true
       referenceable: true
       schema:
@@ -26,10 +26,10 @@ spec:
             spec:
               type: object
               properties:
-                nodePort:
+                deviceUrl:
                   type: string
                 creds:
                   type: string
               required:
-                - nodePort
+                - deviceUrl
                 - creds

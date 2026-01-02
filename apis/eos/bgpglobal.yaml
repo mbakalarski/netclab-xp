@@ -14,9 +14,9 @@ spec:
   versions:
     - name: v1alpha1
       additionalPrinterColumns:
-      - name: NODE-PORT
+      - name: DEVICE-URL
         type: string
-        jsonPath: .spec.nodePort
+        jsonPath: .spec.deviceUrl
       - name: ASN
         type: integer
         jsonPath: .spec.asn
@@ -32,7 +32,7 @@ spec:
             spec:
               type: object
               properties:
-                nodePort:
+                deviceUrl:
                   type: string
                 creds:
                   type: string
@@ -41,7 +41,7 @@ spec:
                 routerId:
                   type: string
               required:
-                - nodePort
+                - deviceUrl
                 - creds
                 - asn
                 - routerId

@@ -16,7 +16,7 @@ spec:
     additionalPrinterColumns:
     - name: NODE
       type: string
-      jsonPath: .spec.nodePort
+      jsonPath: .spec.deviceUrl
     - name: VRF
       type: string
       jsonPath: .spec.networkInstance
@@ -47,7 +47,7 @@ spec:
           spec:
             type: object
             properties:
-              nodePort:
+              deviceUrl:
                 type: string
               creds:
                 type: string
@@ -78,7 +78,7 @@ spec:
                 type: integer
                 minimum: 0
             required:
-            - nodePort
+            - deviceUrl
             - creds
             - networkInstance
             - name

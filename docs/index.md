@@ -51,7 +51,7 @@ kind: RoutedInterface
 metadata:
   name: r1e1ip
 spec:
-  nodePort: ceos01.default.svc.cluster.local:6020
+  deviceUrl: https://ceos01.default.svc.cluster.local:6020
   creds: YXJpc3RhOmFyaXN0YQ==
   name: Ethernet1
   ipv4Address: 10.10.10.1
@@ -88,7 +88,7 @@ kind: Router
 metadata:
   name: ceos01
 spec:
-  nodePort: ceos01.default.svc.cluster.local:6020
+  deviceUrl: https://ceos01.default.svc.cluster.local:6020
   creds: YXJpc3RhOmFyaXN0YQ==
   asn: 65001
   routerId: 10.0.0.1
@@ -112,7 +112,7 @@ kind: Router
 metadata:
   name: ceos02
 spec:
-  nodePort: ceos02.default.svc.cluster.local:6020
+  deviceUrl: https://ceos02.default.svc.cluster.local:6020
   creds: YXJpc3RhOmFyaXN0YQ==
   asn: 65002
   routerId: 10.0.0.2
@@ -136,9 +136,9 @@ kubectl get routers
 ```
 
 ```bash
-NAME     NODE-PORT                               ASN     ROUTER-ID   SYNCED   READY   COMPOSITION              AGE
-ceos01   ceos01.default.svc.cluster.local:6020   65001   10.0.0.1    True     True    router.eos.netclab.dev   8m14s
-ceos02   ceos02.default.svc.cluster.local:6020   65002   10.0.0.2    True     True    router.eos.netclab.dev   35s
+NAME     DEVICE-URL                                      ASN     ROUTER-ID   SYNCED   READY   COMPOSITION              AGE
+ceos01   https://ceos01.default.svc.cluster.local:6020   65001   10.0.0.1    True     True    router.eos.netclab.dev   8m14s
+ceos02   https://ceos02.default.svc.cluster.local:6020   65002   10.0.0.2    True     True    router.eos.netclab.dev   35s
 ```
 
 ---
@@ -166,24 +166,24 @@ kubectl get netclab
 ```
 
 ```bash
-NAME                                            NODE-PORT                               ASN     ROUTER-ID   SYNCED   READY   COMPOSITION                  AGE
-bgpglobal.eos.netclab.dev/ceos01-2eedd4b1cab4   ceos01.default.svc.cluster.local:6020   65001   10.0.0.1    True     True    bgpglobals.eos.netclab.dev   3m52s
+NAME                                            DEVICE-URL                                      ASN     ROUTER-ID   SYNCED   READY   COMPOSITION                  AGE
+bgpglobal.eos.netclab.dev/ceos01-2eedd4b1cab4   https://ceos01.default.svc.cluster.local:6020   65001   10.0.0.1    True     True    bgpglobals.eos.netclab.dev   3m52s
 
-NAME                                              NODE-PORT                               NI        REMOTE-AS   REMOTE-IP   SYNCED   READY   COMPOSITION                    AGE
-bgpneighbor.eos.netclab.dev/ceos01-3e0f1822de8d   ceos01.default.svc.cluster.local:6020   default   65002       10.1.2.2    True     True    bgpneighbors.eos.netclab.dev   3m52s
+NAME                                              DEVICE-URL                                      NI        REMOTE-AS   REMOTE-IP   SYNCED   READY   COMPOSITION                    AGE
+bgpneighbor.eos.netclab.dev/ceos01-3e0f1822de8d   https://ceos01.default.svc.cluster.local:6020   default   65002       10.1.2.2    True     True    bgpneighbors.eos.netclab.dev   3m52s
 
-NAME                                            NODE-PORT                               SYNCED   READY   COMPOSITION                  AGE
-iprouting.eos.netclab.dev/ceos01-8c1ecd5acc68   ceos01.default.svc.cluster.local:6020   True     True    iproutings.eos.netclab.dev   3m52s
+NAME                                            DEVICE-URL                                      SYNCED   READY   COMPOSITION                  AGE
+iprouting.eos.netclab.dev/ceos01-8c1ecd5acc68   https://ceos01.default.svc.cluster.local:6020   True     True    iproutings.eos.netclab.dev   3m52s
 
-NAME                                                    NODE-PORT                               NAME        SYNCED   READY   COMPOSITION                          AGE
-loopbackinterface.eos.netclab.dev/ceos01-06a18fc6671a   ceos01.default.svc.cluster.local:6020   Loopback0   True     True    loopbackinterfaces.eos.netclab.dev   3m52s
+NAME                                                    DEVICE-URL                                      NAME        SYNCED   READY   COMPOSITION                          AGE
+loopbackinterface.eos.netclab.dev/ceos01-06a18fc6671a   https://ceos01.default.svc.cluster.local:6020   Loopback0   True     True    loopbackinterfaces.eos.netclab.dev   3m52s
 
-NAME                                                  NODE-PORT                               NAME        IPV4-ADDRESS   IPV4-PREFIX   SYNCED   READY   COMPOSITION                        AGE
-routedinterface.eos.netclab.dev/ceos01-95e43dc583a0   ceos01.default.svc.cluster.local:6020   Ethernet1   10.1.2.1       24            True     True    routedinterfaces.eos.netclab.dev   3m52s
-routedinterface.eos.netclab.dev/ceos01-e2781936df2b   ceos01.default.svc.cluster.local:6020   Loopback0   10.0.0.1       32            True     True    routedinterfaces.eos.netclab.dev   3m52s
+NAME                                                  DEVICE-URL                                      NAME        IPV4-ADDRESS   IPV4-PREFIX   SYNCED   READY   COMPOSITION                        AGE
+routedinterface.eos.netclab.dev/ceos01-95e43dc583a0   https://ceos01.default.svc.cluster.local:6020   Ethernet1   10.1.2.1       24            True     True    routedinterfaces.eos.netclab.dev   3m52s
+routedinterface.eos.netclab.dev/ceos01-e2781936df2b   https://ceos01.default.svc.cluster.local:6020   Loopback0   10.0.0.1       32            True     True    routedinterfaces.eos.netclab.dev   3m52s
 
-NAME                            NODE-PORT                               ASN     ROUTER-ID   SYNCED   READY   COMPOSITION              AGE
-router.eos.netclab.dev/ceos01   ceos01.default.svc.cluster.local:6020   65001   10.0.0.1    True     True    router.eos.netclab.dev   3m52s
+NAME                            DEVICE-URL                                      ASN     ROUTER-ID   SYNCED   READY   COMPOSITION              AGE
+router.eos.netclab.dev/ceos01   https://ceos01.default.svc.cluster.local:6020   65001   10.0.0.1    True     True    router.eos.netclab.dev   3m52s
 ```
 
 ---

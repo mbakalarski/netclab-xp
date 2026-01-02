@@ -3,7 +3,7 @@ kind: RoutedInterface
 metadata:
   name: ceos02e1
 spec:
-  nodePort: ceos02.default.svc.cluster.local:6020
+  deviceUrl: https://ceos02.default.svc.cluster.local:6020
   creds: YXJpc3RhOmFyaXN0YQ==
   name: Ethernet1
   ipv4Address: 10.1.2.2

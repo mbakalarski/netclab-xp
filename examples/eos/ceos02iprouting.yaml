@@ -3,5 +3,5 @@ kind: IpRouting
 metadata:
   name: ceos02
 spec:
-  nodePort: ceos02.default.svc.cluster.local:6020
+  deviceUrl: https://ceos02.default.svc.cluster.local:6020
   creds: YXJpc3RhOmFyaXN0YQ==

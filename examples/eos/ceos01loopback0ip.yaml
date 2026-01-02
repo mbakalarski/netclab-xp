@@ -3,7 +3,7 @@ kind: RoutedInterface
 metadata:
   name: ceos01lo0ip
 spec:
-  nodePort: ceos01.default.svc.cluster.local:6020
+  deviceUrl: https://ceos01.default.svc.cluster.local:6020
   creds: YXJpc3RhOmFyaXN0YQ==
   name: Loopback0
   ipv4Address: 10.0.0.1
