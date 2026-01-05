@@ -46,8 +46,7 @@ spec:
               insecureSkipTLSVerify: true
               headers:
                 Accept: ["application/yang-data+json"]
-                Authorization:
-                - Basic {{ printf "%s" "{{ netclab-xp-common-eos-auth:crossplane-system:basic }}" }}
+                Authorization: ["Basic {{ .observed.composite.resource.spec.creds }}"]
               payload:
                 baseUrl: "{{ $deviceUrl }}/restconf/data/openconfig-network-instance:network-instances/network-instance=default/protocols/protocol=BGP,BGP/bgp/peer-groups/peer-group={{ .observed.composite.resource.spec.peerGroupName }}"
                 body: |
@@ -83,8 +82,7 @@ spec:
               insecureSkipTLSVerify: true
               headers:
                 Accept: ["application/yang-data+json"]
-                Authorization:
-                - Basic {{ printf "%s" "{{ netclab-xp-common-eos-auth:crossplane-system:basic }}" }}
+                Authorization: ["Basic {{ .observed.composite.resource.spec.creds }}"]
               payload:
                 baseUrl: "{{ $deviceUrl }}/restconf/data/openconfig-network-instance:network-instances/network-instance=default/protocols/protocol=BGP,BGP/bgp/peer-groups/peer-group={{ .observed.composite.resource.spec.peerGroupName }}/config"
                 body: |
@@ -121,8 +119,7 @@ spec:
               insecureSkipTLSVerify: true
               headers:
                 Accept: ["application/yang-data+json"]
-                Authorization:
-                - Basic {{ printf "%s" "{{ netclab-xp-common-eos-auth:crossplane-system:basic }}" }}
+                Authorization: ["Basic {{ .observed.composite.resource.spec.creds }}"]
               payload:
                 baseUrl: "{{ $deviceUrl }}/restconf/data/openconfig-network-instance:network-instances/network-instance=default/protocols/protocol=BGP,BGP/bgp/peer-groups/peer-group={{ .observed.composite.resource.spec.peerGroupName }}/transport/config"
                 body: |
@@ -159,8 +156,7 @@ spec:
               insecureSkipTLSVerify: true
               headers:
                 Accept: ["application/yang-data+json"]
-                Authorization:
-                - Basic {{ printf "%s" "{{ netclab-xp-common-eos-auth:crossplane-system:basic }}" }}
+                Authorization: ["Basic {{ .observed.composite.resource.spec.creds }}"]
               payload:
                 baseUrl: "{{ $deviceUrl }}/restconf/data/openconfig-network-instance:network-instances/network-instance=default/protocols/protocol=BGP,BGP/bgp/peer-groups/peer-group={{ .observed.composite.resource.spec.peerGroupName }}/enable-bfd/config"
                 body: |
@@ -197,8 +193,7 @@ spec:
               insecureSkipTLSVerify: true
               headers:
                 Accept: ["application/yang-data+json"]
-                Authorization:
-                - Basic {{ printf "%s" "{{ netclab-xp-common-eos-auth:crossplane-system:basic }}" }}
+                Authorization: ["Basic {{ .observed.composite.resource.spec.creds }}"]
               payload:
                 baseUrl: "{{ $deviceUrl }}/restconf/data/openconfig-network-instance:network-instances/network-instance=default/protocols/protocol=BGP,BGP/bgp/peer-groups/peer-group={{ .observed.composite.resource.spec.peerGroupName }}/ebgp-multihop/config"
                 body: |
@@ -243,8 +238,7 @@ spec:
               insecureSkipTLSVerify: true
               headers:
                 Accept: ["application/yang-data+json"]
-                Authorization:
-                - Basic {{ printf "%s" "{{ netclab-xp-common-eos-auth:crossplane-system:basic }}" }}
+                Authorization: ["Basic {{ .observed.composite.resource.spec.creds }}"]
               payload:
                 baseUrl: "{{ $deviceUrl }}/restconf/data/openconfig-network-instance:network-instances/network-instance=default/protocols/protocol=BGP,BGP/bgp/peer-groups/peer-group={{ .observed.composite.resource.spec.peerGroupName }}/arista-bgp-augments:prefix-limit/config"
                 body: |
@@ -281,8 +275,7 @@ spec:
               insecureSkipTLSVerify: true
               headers:
                 Accept: ["application/yang-data+json"]
-                Authorization:
-                - Basic {{ printf "%s" "{{ netclab-xp-common-eos-auth:crossplane-system:basic }}" }}
+                Authorization: ["Basic {{ .observed.composite.resource.spec.creds }}"]
               payload:
                 baseUrl: "{{ $deviceUrl }}/restconf/data/openconfig-network-instance:network-instances/network-instance=default/protocols/protocol=BGP,BGP/bgp/peer-groups/peer-group={{ .observed.composite.resource.spec.peerGroupName }}/config"
                 body: |
