@@ -34,8 +34,7 @@ spec:
           {{- $address := .observed.composite.resource.spec.device }}
           {{- with index .context "apiextensions.crossplane.io/environment" }}
             {{- $deviceUrl = printf "%s://%s:%d" .restconf.scheme $address .restconf.port }}
-          {{- end -}}
-
+          {{- end }}
           ---
           apiVersion: http.crossplane.io/v1alpha2
           kind: Request
