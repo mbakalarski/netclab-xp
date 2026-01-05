@@ -8,6 +8,19 @@ spec:
     kind: BgpPeerGroup
   mode: Pipeline
   pipeline:
+  - step: environmentConfigs
+    functionRef:
+      name: crossplane-contrib-function-environment-configs
+    input:
+      apiVersion: environmentconfigs.fn.crossplane.io/v1beta1
+      kind: Input
+      spec:
+        environmentConfigs:
+        - type: Reference
+          ref:
+            name: endpoint-protocols
+
+
   - step: create-request
     functionRef:
       name: crossplane-contrib-function-go-templating

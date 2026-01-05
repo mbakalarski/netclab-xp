@@ -26,5 +26,10 @@ spec:
       package: xpkg.upbound.io/crossplane-contrib/function-auto-ready
       version: ">=v0.5.2"
 
+    - apiVersion: pkg.crossplane.io/v1
+      kind: Function
+      package: xpkg.upbound.io/crossplane-contrib/function-environment-configs
+      version: ">=v0.4.0"
+
   crossplane:
     version: ">=v2.1.1"

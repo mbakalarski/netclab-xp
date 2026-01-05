@@ -14,9 +14,12 @@ spec:
   versions:
   - name: v1alpha1
     additionalPrinterColumns:
-    - name: NODE
+    - name: EP-ADDR
       type: string
-      jsonPath: .spec.deviceUrl
+      jsonPath: .spec.endpoint.address
+    - name: EP-TYPE
+      type: string
+      jsonPath: .spec.endpoint.type
     - name: VRF
       type: string
       jsonPath: .spec.networkInstance
@@ -47,8 +50,16 @@ spec:
           spec:
             type: object
             properties:
-              deviceUrl:
-                type: string
+              endpoint:
+                type: object
+                properties:
+                  address:
+                    type: string
+                  type:
+                    type: string
+                    enum:
+                    - restconf
+                    - jsonrpc
               creds:
                 type: string
               networkInstance:

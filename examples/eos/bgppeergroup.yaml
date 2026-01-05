@@ -3,7 +3,9 @@ kind: BgpPeerGroup
 metadata:
   name: evpn-overlay-peers
 spec:
-  deviceUrl: https://ceos01.default.svc.cluster.local:6020
+  endpoint:
+    address: ceos01.default.svc.cluster.local
+    type: restconf
   creds: YXJpc3RhOmFyaXN0YQ==
   networkInstance: default
   name: EVPN-OVERLAY-PEERS
