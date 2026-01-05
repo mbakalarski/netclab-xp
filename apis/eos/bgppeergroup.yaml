@@ -49,8 +49,6 @@ spec:
             properties:
               device:
                 type: string
-              creds:
-                type: string
               networkInstance:
                 type: string
                 default: default
@@ -80,5 +78,4 @@ spec:
                 minimum: 0
             required:
             - device
-            - creds
             - peerGroupName
