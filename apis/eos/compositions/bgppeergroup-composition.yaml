@@ -19,6 +19,9 @@ spec:
         - type: Reference
           ref:
             name: endpoint-protocols
+        - type: Reference
+          ref:
+            name: eos-common-auth
 
 
   - step: create-request
