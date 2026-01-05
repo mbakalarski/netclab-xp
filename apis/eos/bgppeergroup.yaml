@@ -49,8 +49,6 @@ spec:
             properties:
               device:
                 type: string
-              creds:
-                type: string
               networkInstance:
                 type: string
                 default: default
