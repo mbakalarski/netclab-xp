@@ -14,18 +14,15 @@ spec:
   versions:
   - name: v1alpha1
     additionalPrinterColumns:
-    - name: EP-ADDR
+    - name: DEVICE
       type: string
-      jsonPath: .spec.endpoint.address
-    - name: EP-TYPE
-      type: string
-      jsonPath: .spec.endpoint.type
+      jsonPath: .spec.device
     - name: VRF
       type: string
       jsonPath: .spec.networkInstance
     - name: PG
       type: string
-      jsonPath: .spec.name
+      jsonPath: .spec.peerGroupName
     - name: NHU
       type: boolean
       jsonPath: .spec.nextHopUnchanged
@@ -50,21 +47,14 @@ spec:
           spec:
             type: object
             properties:
-              endpoint:
-                type: object
-                properties:
-                  address:
-                    type: string
-                  type:
-                    type: string
-                    enum:
-                    - restconf
-                    - jsonrpc
+              device:
+                type: string
               creds:
                 type: string
               networkInstance:
                 type: string
-              name:
+                default: default
+              peerGroupName:
                 type: string
               nextHopUnchanged:
                 type: boolean
@@ -89,7 +79,6 @@ spec:
                 type: integer
                 minimum: 0
             required:
-            - deviceUrl
+            - device
             - creds
-            - networkInstance
-            - name
+            - peerGroupName
