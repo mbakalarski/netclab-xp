@@ -14,9 +14,9 @@ spec:
   versions:
   - name: v1alpha1
     additionalPrinterColumns:
-    - name: DEVICE
+    - name: ENDPOINT
       type: string
-      jsonPath: .spec.device
+      jsonPath: .spec.endpoint
     - name: VRF
       type: string
       jsonPath: .spec.networkInstance
@@ -47,7 +47,7 @@ spec:
           spec:
             type: object
             properties:
-              device:
+              endpoint:
                 type: string
               networkInstance:
                 type: string
@@ -77,5 +77,5 @@ spec:
                 type: integer
                 minimum: 0
             required:
-            - device
+            - endpoint
             - peerGroupName

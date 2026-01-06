@@ -35,7 +35,7 @@ spec:
         template: |
           {{- $deviceUrl := "" }}
           {{- $basicAuth := "" }}
-          {{- $address := .observed.composite.resource.spec.device }}
+          {{- $address := .observed.composite.resource.spec.endpoint }}
           {{- with index .context "apiextensions.crossplane.io/environment" }}
             {{- $deviceUrl = printf "%s://%s:%d" .restconf.scheme $address .restconf.port }}
             {{- $basicAuth = .basicAuth }}

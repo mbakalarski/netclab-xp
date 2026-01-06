@@ -3,7 +3,7 @@ kind: BgpPeerGroup
 metadata:
   name: evpn-overlay-peers
 spec:
-  device: ceos01.default.svc.cluster.local
+  endpoint: ceos01.default.svc.cluster.local
   peerGroupName: EVPN-OVERLAY-PEERS
   nextHopUnchanged: true
   updateSource: Loopback0
