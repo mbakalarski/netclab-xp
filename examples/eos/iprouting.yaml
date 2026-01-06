@@ -1,0 +1,6 @@
+apiVersion: eos.netclab.dev/v1alpha1
+kind: IpRouting
+metadata:
+  name: ceos01
+spec:
+  endpoint: ceos01.default.svc.cluster.local
