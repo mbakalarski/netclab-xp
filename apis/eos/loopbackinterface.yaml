@@ -14,12 +14,12 @@ spec:
   versions:
     - name: v1alpha1
       additionalPrinterColumns:
-      - name: DEVICE-URL
+      - name: ENDPOINT
         type: string
-        jsonPath: .spec.deviceUrl
-      - name: NAME
+        jsonPath: .spec.endpoint
+      - name: IF
         type: string
-        jsonPath: .spec.name
+        jsonPath: .spec.ifName
       served: true
       referenceable: true
       schema:
@@ -29,13 +29,10 @@ spec:
             spec:
               type: object
               properties:
-                deviceUrl:
+                endpoint:
                   type: string
-                creds:
-                  type: string
-                name:
+                ifName:
                   type: string
               required:
-                - deviceUrl
-                - creds
-                - name
+                - endpoint
+                - ifName
