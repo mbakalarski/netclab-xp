@@ -23,8 +23,7 @@ spec:
           ref:
             name: eos-common-auth
 
-
-  - step: create-request
+  - step: requests
     functionRef:
       name: crossplane-contrib-function-go-templating
     input:
@@ -311,7 +310,6 @@ spec:
                 method: DELETE
                 url: .payload.baseUrl + "/send-community-type"
           {{- end }}
-
 
   - step: auto-ready
     functionRef:

@@ -14,9 +14,9 @@ spec:
   versions:
     - name: v1alpha1
       additionalPrinterColumns:
-      - name: DEVICE-URL
+      - name: ENDPOINT
         type: string
-        jsonPath: .spec.deviceUrl
+        jsonPath: .spec.endpoint
       - name: ASN
         type: integer
         jsonPath: .spec.asn
@@ -32,16 +32,13 @@ spec:
             spec:
               type: object
               properties:
-                deviceUrl:
-                  type: string
-                creds:
+                endpoint:
                   type: string
                 asn:
                   type: integer
                 routerId:
                   type: string
               required:
-                - deviceUrl
-                - creds
+                - endpoint
                 - asn
                 - routerId

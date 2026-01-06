@@ -1,0 +1,8 @@
+apiVersion: eos.netclab.dev/v1alpha1
+kind: BgpGlobal
+metadata:
+  name: bgpglobal
+spec:
+  endpoint: ceos01.default.svc.cluster.local
+  asn: 65001
+  routerId: 10.0.0.1
