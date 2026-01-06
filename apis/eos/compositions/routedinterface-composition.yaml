@@ -8,7 +8,22 @@ spec:
     kind: RoutedInterface
   mode: Pipeline
   pipeline:
-  - step: create-request
+  - step: environmentConfigs
+    functionRef:
+      name: crossplane-contrib-function-environment-configs
+    input:
+      apiVersion: environmentconfigs.fn.crossplane.io/v1beta1
+      kind: Input
+      spec:
+        environmentConfigs:
+        - type: Reference
+          ref:
+            name: endpoint-protocols
+        - type: Reference
+          ref:
+            name: eos-common-auth
+
+  - step: requests
     functionRef:
       name: crossplane-contrib-function-go-templating
     input:
@@ -17,19 +32,27 @@ spec:
       source: Inline
       inline:
         template: |
+          {{- $deviceUrl := "" }}
+          {{- $basicAuth := "" }}
+          {{- $address := .observed.composite.resource.spec.endpoint }}
+          {{- with index .context "apiextensions.crossplane.io/environment" }}
+            {{- $deviceUrl = printf "%s://%s:%d" .restconf.scheme $address .restconf.port }}
+            {{- $basicAuth = .basicAuth }}
+          {{- end }}
+          ---
           apiVersion: http.crossplane.io/v1alpha2
           kind: Request
           metadata:
             annotations:
-              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.spec.name }}-ipv4
+              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.spec.ifName }}-ipv4
           spec:
             forProvider:
               insecureSkipTLSVerify: true
               headers:
                 Accept: ["application/yang-data+json"]
-                Authorization: ["Basic {{ .observed.composite.resource.spec.creds }}"]
+                Authorization: ["Basic {{ $basicAuth }}"]
               payload:
-                baseUrl: "{{ .observed.composite.resource.spec.deviceUrl }}/restconf/data/openconfig-interfaces:interfaces/interface={{ .observed.composite.resource.spec.name }}/subinterfaces/subinterface=0"
+                baseUrl: "{{ $deviceUrl }}/restconf/data/openconfig-interfaces:interfaces/interface={{ .observed.composite.resource.spec.ifName }}/subinterfaces/subinterface=0"
                 body: |
                   {
                     "index": 0,

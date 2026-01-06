@@ -14,16 +14,16 @@ spec:
   versions:
     - name: v1alpha1
       additionalPrinterColumns:
-      - name: DEVICE-URL
+      - name: ENDPOINT
         type: string
-        jsonPath: .spec.deviceUrl
-      - name: NAME
+        jsonPath: .spec.endpoint
+      - name: IF
         type: string
-        jsonPath: .spec.name
-      - name: IPV4-ADDRESS
+        jsonPath: .spec.ifName
+      - name: IP
         type: string
         jsonPath: .spec.ipv4Address
-      - name: IPV4-PREFIX-LENGTH
+      - name: PLEN
         type: integer
         jsonPath: .spec.ipv4PrefixLength
       served: true
@@ -35,19 +35,16 @@ spec:
             spec:
               type: object
               properties:
-                deviceUrl:
+                endpoint:
                   type: string
-                creds:
-                  type: string
-                name:
+                ifName:
                   type: string
                 ipv4Address:
                   type: string
                 ipv4PrefixLength:
                   type: integer
               required:
-                - deviceUrl
-                - creds
-                - name
+                - endpoint
+                - ifName
                 - ipv4Address
                 - ipv4PrefixLength
