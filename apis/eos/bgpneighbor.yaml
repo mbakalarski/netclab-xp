@@ -14,10 +14,10 @@ spec:
   versions:
     - name: v1alpha1
       additionalPrinterColumns:
-      - name: DEVICE-URL
+      - name: ENDPOINT
         type: string
-        jsonPath: .spec.deviceUrl
-      - name: NI
+        jsonPath: .spec.endpoint
+      - name: VRF
         type: string
         jsonPath: .spec.networkInstance
       - name: REMOTE-AS
@@ -35,19 +35,18 @@ spec:
             spec:
               type: object
               properties:
-                deviceUrl:
+                endpoint:
                   type: string
                 creds:
                   type: string
                 networkInstance:
                   type: string
+                  default: default
                 neighborAsn:
                   type: integer
                 neighborIp:
                   type: string
               required:
-                - deviceUrl
-                - creds
-                - networkInstance
+                - endpoint
                 - neighborAsn
                 - neighborIp
