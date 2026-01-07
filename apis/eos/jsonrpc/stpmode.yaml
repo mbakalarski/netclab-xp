@@ -14,9 +14,9 @@ spec:
   versions:
   - name: v1alpha1
     additionalPrinterColumns:
-    - name: TARGET
+    - name: ENDPOINT
       type: string
-      jsonPath: .spec.deviceUrl
+      jsonPath: .spec.endpoint
     - name: STP
       type: string
       jsonPath: .spec.stpMode
@@ -29,9 +29,7 @@ spec:
           spec:
             type: object
             properties:
-              deviceUrl:
-                type: string
-              creds:
+              endpoint:
                 type: string
               stpMode:
                 type: string
@@ -39,6 +37,5 @@ spec:
                 - mstp
                 - none
             required:
-            - deviceUrl
-            - creds
+            - endpoint
             - stpMode

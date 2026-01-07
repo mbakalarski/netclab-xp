@@ -1,9 +1,0 @@
-apiVersion: eos.netclab.dev/v1alpha1
-kind: BgpGlobal
-metadata:
-  name: ceos02
-spec:
-  deviceUrl: https://ceos02.default.svc.cluster.local:6020
-  creds: YXJpc3RhOmFyaXN0YQ==
-  asn: 65002
-  routerId: 10.0.0.2
