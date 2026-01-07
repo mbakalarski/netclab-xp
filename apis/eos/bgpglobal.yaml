@@ -38,6 +38,21 @@ spec:
                   type: integer
                 routerId:
                   type: string
+                noBgpDefaultIpv4Unicast:
+                  type: boolean
+                  enum:
+                  - true
+                maximumPaths:
+                  type: object
+                  properties:
+                    ecmp:
+                      type: integer
+                      minimum: 1
+                      maximum: 128
+                    ecmpInstalled:
+                      type: integer
+                      minimum: 1
+                      maximum: 128
               required:
                 - endpoint
                 - asn

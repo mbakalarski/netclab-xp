@@ -1,5 +1,5 @@
 apiVersion: eos.netclab.dev/v1alpha1
-kind: SpineRouter
+kind: Router
 metadata:
   name: dc1-spine1
 spec:
@@ -8,7 +8,7 @@ spec:
   bgp:
     asn: 65100
     routerId: 10.255.0.1
-    defaultIpv4Unicast: false
+    bgpDefaultIpv4Unicast: false
 
     maximumPaths:
       ecmp: 4

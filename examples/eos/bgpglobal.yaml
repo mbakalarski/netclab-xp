@@ -7,7 +7,7 @@ spec:
   asn: 65001
   routerId: 10.0.0.1
 
-  defaultIpv4Unicast: false
+  noBgpDefaultIpv4Unicast: true
 
   maximumPaths:
     ecmp: 4

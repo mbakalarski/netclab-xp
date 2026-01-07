@@ -74,6 +74,43 @@ spec:
                 method: DELETE
                 url: .payload.baseUrl
 
+          {{- if and (hasKey .observed.composite.resource.spec "noBgpDefaultIpv4Unicast") .observed.composite.resource.spec.noBgpDefaultIpv4Unicast }}
+          ---
+          apiVersion: http.crossplane.io/v1alpha2
+          kind: Request
+          metadata:
+            annotations:
+              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-disableV4U
+          spec:
+            forProvider:
+              insecureSkipTLSVerify: true
+              headers:
+                Accept: ["application/yang-data+json"]
+                Authorization: ["Basic {{ $basicAuth }}"]
+              payload:
+                baseUrl: "{{ $deviceUrl }}/restconf/data/openconfig-network-instance:network-instances/network-instance=default/protocols/protocol=BGP,BGP/bgp/global/afi-safis/afi-safi=IPV4_UNICAST/config"
+                body: |
+                  {"openconfig-network-instance:enabled": false}
+
+              mappings:
+              - action: CREATE
+                method: PATCH
+                url: .payload.baseUrl
+                body: .payload.body
+
+              - action: UPDATE
+                method: PATCH
+                url: .payload.baseUrl
+                body: .payload.body
+
+              - action: OBSERVE
+                url: .payload.baseUrl
+
+              - action: REMOVE
+                method: DELETE
+                url: .payload.baseUrl
+          {{- end }}
+
   - step: auto-ready
     functionRef:
       name: crossplane-contrib-function-auto-ready
