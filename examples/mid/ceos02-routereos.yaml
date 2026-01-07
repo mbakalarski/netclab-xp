@@ -3,12 +3,11 @@ kind: Router
 metadata:
   name: ceos02
 spec:
-  deviceUrl: https://ceos02.default.svc.cluster.local:6020
-  creds: YXJpc3RhOmFyaXN0YQ==
+  endpoint: ceos02.default.svc.cluster.local
   asn: 65002
   routerId: 10.0.0.2
   routedInterfaces:
-  - name: Ethernet1
+  - ifName: Ethernet1
     ipv4Address: 10.1.2.2
     ipv4PrefixLength: 24
   bgpNeighbors:

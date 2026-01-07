@@ -17,9 +17,9 @@ spec:
     served: true
     referenceable: true
     additionalPrinterColumns:
-    - name: DEVICE-URL
+    - name: ENDPOINT
       type: string
-      jsonPath: .spec.deviceUrl
+      jsonPath: .spec.endpoint
     - name: ASN
       type: integer
       jsonPath: .spec.asn
@@ -34,9 +34,7 @@ spec:
           spec:
             type: object
             properties:
-              deviceUrl:
-                type: string
-              creds:
+              endpoint:
                 type: string
               asn:
                 type: integer
@@ -47,14 +45,14 @@ spec:
                 items:
                   type: object
                   properties:
-                    name:
+                    ifName:
                       type: string
                     ipv4Address:
                       type: string
                     ipv4PrefixLength:
                       type: integer
                   required:
-                  - name
+                  - ifName
                   - ipv4Address
                   - ipv4PrefixLength
               bgpNeighbors:
@@ -73,7 +71,6 @@ spec:
                   - neighborAsn
                   - neighborIp
             required:
-            - deviceUrl
-            - creds
+            - endpoint
             - asn
             - routerId
