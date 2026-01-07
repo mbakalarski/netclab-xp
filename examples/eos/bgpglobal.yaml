@@ -6,3 +6,9 @@ spec:
   endpoint: ceos01.default.svc.cluster.local
   asn: 65001
   routerId: 10.0.0.1
+
+  defaultIpv4Unicast: false
+
+  maximumPaths:
+    ecmp: 4
+    ecmpInstalled: 4
