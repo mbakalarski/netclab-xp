@@ -12,7 +12,8 @@ color: '#F8FAFC'            # light text
 # 🚀 Introducing [**netclab-xp**](https://github.com/mbakalarski/netclab-xp)
 *Declarative Router Configuration with Crossplane*  
 <br>
-Manage physical, virtual, and containerized routers *just like cloud resources* — with **Kubernetes-native GitOps workflows**.
+> ***Extend Kubernetes to manage any resource anywhere***
+> Powered by [crossplane.io](https://www.crossplane.io)
 
 ---
 
@@ -20,8 +21,8 @@ Manage physical, virtual, and containerized routers *just like cloud resources* 
 <br>
 
 - **Declarative & GitOps-ready** → manage routers like cloud resources  
-- **Kubernetes-native state** → real-time reconciliation vs. Terraform  
-- **OpenConfig models when possible** → differences handled automatically  
+- **Kubernetes-native state** → continuous reconciliation  
+- **OpenConfig** → differences handled automatically  
 - **RESTCONF and JSON-RPC support** → starting with Arista EOS / cEOS  
 - **Fast onboarding** → add new routers or services easily
 
@@ -185,7 +186,7 @@ router.eos.netclab.dev/ceos01   ceos01.default.svc.cluster.local   65001   10.0.
 
 # 🎯 Next Steps
 
-*GH Repo:*
+*Repo:*
 [https://github.com/mbakalarski/netclab-xp](https://github.com/mbakalarski/netclab-xp)
 
 *Registry:*
