@@ -62,12 +62,12 @@ spec:
                   properties:
                     networkInstance:
                       type: string
+                      default: default
                     neighborAsn:
                       type: integer
                     neighborIp:
                       type: string
                   required:
-                  - networkInstance
                   - neighborAsn
                   - neighborIp
             required:

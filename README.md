@@ -89,7 +89,7 @@ kind: Configuration
 metadata:
   name: netclab-xp
 spec:
-  package: xpkg.upbound.io/netclab/netclab-xp:v0.2.0
+  package: xpkg.upbound.io/netclab/netclab-xp:v0.2.1
 EOF
 ```
 
@@ -264,8 +264,7 @@ spec:
     ipv4Address: 10.1.2.1
     ipv4PrefixLength: 24
   bgpNeighbors:
-  - networkInstance: default
-    neighborAsn: 65002
+  - neighborAsn: 65002
     neighborIp: 10.1.2.2
 EOF
 ```
@@ -329,8 +328,7 @@ spec:
     ipv4Address: 10.1.2.2
     ipv4PrefixLength: 24
   bgpNeighbors:
-  - networkInstance: default
-    neighborAsn: 65001
+  - neighborAsn: 65001
     neighborIp: 10.1.2.1
 EOF
 ```
