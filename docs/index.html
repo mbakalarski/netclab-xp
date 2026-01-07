@@ -11,16 +11,19 @@
 </style></head><body><div class="bespoke-marp-osc"><button data-bespoke-marp-osc="prev" tabindex="-1" title="Previous slide">Previous slide</button><span data-bespoke-marp-osc="page"></span><button data-bespoke-marp-osc="next" tabindex="-1" title="Next slide">Next slide</button><button data-bespoke-marp-osc="fullscreen" tabindex="-1" title="Toggle fullscreen (f)">Toggle fullscreen</button><button data-bespoke-marp-osc="presenter" tabindex="-1" title="Open presenter view (p)">Open presenter view</button></div><div id=":$p"><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="1" data-paginate="true" data-background-color="#1E293B" data-color="#F8FAFC" data-theme="default" lang="C" data-marpit-pagination="1" style="--paginate:true;--background-color:#1E293B;--color:#F8FAFC;--theme:default;color:#F8FAFC;background-color:#1E293B;background-image:none;" data-marpit-pagination-total="13">
 <h1 id="%F0%9F%9A%80-introducing-netclab-xp"><img class="emoji" draggable="false" alt="🚀" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f680.svg" data-marp-twemoji=""/> Introducing <a href="https://github.com/mbakalarski/netclab-xp"><strong>netclab-xp</strong></a></h1>
 <p><em>Declarative Router Configuration with Crossplane</em><br />
-<br /><br />
-Manage physical, virtual, and containerized routers <em>just like cloud resources</em> — with <strong>Kubernetes-native GitOps workflows</strong>.</p>
+<br /></p>
+<blockquote>
+<p><em><strong>Extend Kubernetes to manage any resource anywhere</strong></em><br />
+Powered by <a href="https://www.crossplane.io">crossplane.io</a></p>
+</blockquote>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="2" data-paginate="true" data-background-color="#1E293B" data-color="#F8FAFC" data-theme="default" lang="C" data-marpit-pagination="2" style="--paginate:true;--background-color:#1E293B;--color:#F8FAFC;--theme:default;color:#F8FAFC;background-color:#1E293B;background-image:none;" data-marpit-pagination-total="13">
 <h1 id="%F0%9F%94%A7-why-netclab-xp-matters"><img class="emoji" draggable="false" alt="🔧" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f527.svg" data-marp-twemoji=""/> Why netclab-xp Matters</h1>
 <br />
 <ul>
 <li><strong>Declarative &amp; GitOps-ready</strong> → manage routers like cloud resources</li>
-<li><strong>Kubernetes-native state</strong> → real-time reconciliation vs. Terraform</li>
-<li><strong>OpenConfig models when possible</strong> → differences handled automatically</li>
+<li><strong>Kubernetes-native state</strong> → continuous reconciliation</li>
+<li><strong>OpenConfig</strong> → differences handled automatically</li>
 <li><strong>RESTCONF and JSON-RPC support</strong> → starting with Arista EOS / cEOS</li>
 <li><strong>Fast onboarding</strong> → add new routers or services easily</li>
 </ul>
@@ -46,9 +49,8 @@ kind: RoutedInterface
 metadata:
   name: r1e1ip
 spec:
-  nodePort: ceos01.default.svc.cluster.local:6020
-  creds: YXJpc3RhOmFyaXN0YQ==
-  name: Ethernet1
+  endpoint: ceos01.default.svc.cluster.local
+  ifName: Ethernet1
   ipv4Address: 10.10.10.1
   ipv4PrefixLength: 24
 EOF</span>
@@ -75,17 +77,15 @@ kind: Router
 metadata:
   name: ceos01
 spec:
-  nodePort: ceos01.default.svc.cluster.local:6020
-  creds: YXJpc3RhOmFyaXN0YQ==
+  endpoint: ceos01.default.svc.cluster.local
   asn: 65001
   routerId: 10.0.0.1
   routedInterfaces:
-  - name: Ethernet1
+  - ifName: Ethernet1
     ipv4Address: 10.1.2.1
     ipv4PrefixLength: 24
   bgpNeighbors:
-  - networkInstance: default
-    neighborAsn: 65002
+  - neighborAsn: 65002
     neighborIp: 10.1.2.2
 EOF</span>
 </code></pre>
@@ -97,17 +97,15 @@ kind: Router
 metadata:
   name: ceos02
 spec:
-  nodePort: ceos02.default.svc.cluster.local:6020
-  creds: YXJpc3RhOmFyaXN0YQ==
+  endpoint: ceos02.default.svc.cluster.local
   asn: 65002
   routerId: 10.0.0.2
   routedInterfaces:
-  - name: Ethernet1
+  - ifName: Ethernet1
     ipv4Address: 10.1.2.2
     ipv4PrefixLength: 24
   bgpNeighbors:
-  - networkInstance: default
-    neighborAsn: 65001
+  - neighborAsn: 65001
     neighborIp: 10.1.2.1
 EOF</span>
 </code></pre>
@@ -116,9 +114,9 @@ EOF</span>
 <h1 id="check-resources">Check resources</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-bash">kubectl get routers
 </code></pre>
-<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-bash">NAME     NODE-PORT                               ASN     ROUTER-ID   SYNCED   READY   COMPOSITION              AGE
-ceos01   ceos01.default.svc.cluster.local:6020   65001   10.0.0.1    True     True    router.eos.netclab.dev   8m14s
-ceos02   ceos02.default.svc.cluster.local:6020   65002   10.0.0.2    True     True    router.eos.netclab.dev   35s
+<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-bash">NAME     ENDPOINT                           ASN     ROUTER-ID   SYNCED   READY   COMPOSITION               AGE
+ceos01   ceos01.default.svc.cluster.local   65001   10.0.0.1    True     True    routers.eos.netclab.dev   3m36s
+ceos02   ceos02.default.svc.cluster.local   65002   10.0.0.2    True     True    routers.eos.netclab.dev   59s
 </code></pre>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="11" data-paginate="true" data-background-color="#1E293B" data-color="#F8FAFC" data-theme="default" lang="C" data-marpit-pagination="11" style="--paginate:true;--background-color:#1E293B;--color:#F8FAFC;--theme:default;color:#F8FAFC;background-color:#1E293B;background-image:none;" data-marpit-pagination-total="13">
@@ -129,38 +127,38 @@ ceos02   ceos02.default.svc.cluster.local:6020   65002   10.0.0.2    True     Tr
 Router identifier 10.0.0.1, local AS number 65001
 Neighbor Status Codes: m - Under maintenance
   Neighbor V AS           MsgRcvd   MsgSent  InQ OutQ  Up/Down State   PfxRcd PfxAcc PfxAdv
-  10.1.2.2 4 65002             12        16    0    0 00:01:11 Estab   0      0      0
+  10.1.2.2 4 65002              5         5    0    0 00:01:19 Estab   0      0      0
 </code></pre>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="12" data-paginate="true" data-background-color="#1E293B" data-color="#F8FAFC" data-theme="default" lang="C" data-marpit-pagination="12" style="--paginate:true;--background-color:#1E293B;--color:#F8FAFC;--theme:default;color:#F8FAFC;background-color:#1E293B;background-image:none;" data-marpit-pagination-total="13">
 <h1 id="verify-more-synced-and-ready">Verify more SYNCED and READY</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-bash">kubectl get netclab
 </code></pre>
-<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-bash">NAME                                            NODE-PORT                               ASN     ROUTER-ID   SYNCED   READY   COMPOSITION                  AGE
-bgpglobal.eos.netclab.dev/ceos01-2eedd4b1cab4   ceos01.default.svc.cluster.local:6020   65001   10.0.0.1    True     True    bgpglobals.eos.netclab.dev   3m52s
+<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-bash">NAME                                            ENDPOINT                           ASN     ROUTER-ID   SYNCED   READY   COMPOSITION                  AGE
+bgpglobal.eos.netclab.dev/ceos01-abcf5d7dbd2a   ceos01.default.svc.cluster.local   65001   10.0.0.1    True     True    bgpglobals.eos.netclab.dev   82s
 
-NAME                                              NODE-PORT                               NI        REMOTE-AS   REMOTE-IP   SYNCED   READY   COMPOSITION                    AGE
-bgpneighbor.eos.netclab.dev/ceos01-3e0f1822de8d   ceos01.default.svc.cluster.local:6020   default   65002       10.1.2.2    True     True    bgpneighbors.eos.netclab.dev   3m52s
+NAME                                              ENDPOINT                           VRF       REMOTE-AS   REMOTE-IP   SYNCED   READY   COMPOSITION                    AGE
+bgpneighbor.eos.netclab.dev/ceos01-973c82346f34   ceos01.default.svc.cluster.local   default   65002       10.1.2.2    True     True    bgpneighbors.eos.netclab.dev   82s
 
-NAME                                            NODE-PORT                               SYNCED   READY   COMPOSITION                  AGE
-iprouting.eos.netclab.dev/ceos01-8c1ecd5acc68   ceos01.default.svc.cluster.local:6020   True     True    iproutings.eos.netclab.dev   3m52s
+NAME                                            ENDPOINT                           SYNCED   READY   COMPOSITION                  AGE
+iprouting.eos.netclab.dev/ceos01-5525df60016e   ceos01.default.svc.cluster.local   True     True    iproutings.eos.netclab.dev   82s
 
-NAME                                                    NODE-PORT                               NAME        SYNCED   READY   COMPOSITION                          AGE
-loopbackinterface.eos.netclab.dev/ceos01-06a18fc6671a   ceos01.default.svc.cluster.local:6020   Loopback0   True     True    loopbackinterfaces.eos.netclab.dev   3m52s
+NAME                                                    ENDPOINT                           IF          SYNCED   READY   COMPOSITION                          AGE
+loopbackinterface.eos.netclab.dev/ceos01-f7043813344c   ceos01.default.svc.cluster.local   Loopback0   True     True    loopbackinterfaces.eos.netclab.dev   82s
 
-NAME                                                  NODE-PORT                               NAME        IPV4-ADDRESS   IPV4-PREFIX   SYNCED   READY   COMPOSITION                        AGE
-routedinterface.eos.netclab.dev/ceos01-95e43dc583a0   ceos01.default.svc.cluster.local:6020   Ethernet1   10.1.2.1       24            True     True    routedinterfaces.eos.netclab.dev   3m52s
-routedinterface.eos.netclab.dev/ceos01-e2781936df2b   ceos01.default.svc.cluster.local:6020   Loopback0   10.0.0.1       32            True     True    routedinterfaces.eos.netclab.dev   3m52s
+NAME                                                  ENDPOINT                           IF          IP         PLEN   SYNCED   READY   COMPOSITION                        AGE
+routedinterface.eos.netclab.dev/ceos01-466930a040e3   ceos01.default.svc.cluster.local   Loopback0   10.0.0.1   32     True     True    routedinterfaces.eos.netclab.dev   82s
+routedinterface.eos.netclab.dev/ceos01-ce9e542ce06c   ceos01.default.svc.cluster.local   Ethernet1   10.1.2.1   24     True     True    routedinterfaces.eos.netclab.dev   82s
 
-NAME                            NODE-PORT                               ASN     ROUTER-ID   SYNCED   READY   COMPOSITION              AGE
-router.eos.netclab.dev/ceos01   ceos01.default.svc.cluster.local:6020   65001   10.0.0.1    True     True    router.eos.netclab.dev   3m52s
+NAME                            ENDPOINT                           ASN     ROUTER-ID   SYNCED   READY   COMPOSITION               AGE
+router.eos.netclab.dev/ceos01   ceos01.default.svc.cluster.local   65001   10.0.0.1    True     True    routers.eos.netclab.dev   82s
 </code></pre>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="13" data-paginate="true" data-background-color="#1E293B" data-color="#F8FAFC" data-theme="default" lang="C" data-marpit-pagination="13" style="--paginate:true;--background-color:#1E293B;--color:#F8FAFC;--theme:default;color:#F8FAFC;background-color:#1E293B;background-image:none;" data-marpit-pagination-total="13">
 <h1 id="%F0%9F%8E%AF-next-steps"><img class="emoji" draggable="false" alt="🎯" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f3af.svg" data-marp-twemoji=""/> Next Steps</h1>
-<p><em>GH Repo:</em><br />
+<p><em>Repo:</em><br />
 <a href="https://github.com/mbakalarski/netclab-xp">https://github.com/mbakalarski/netclab-xp</a></p>
-<p><em>Upbound Marketplace:</em><br />
+<p><em>Registry:</em><br />
 <a href="https://marketplace.upbound.io/configurations/netclab/netclab-xp">https://marketplace.upbound.io/configurations/netclab/netclab-xp</a></p>
 <p><em>Listed in Crossplane Adopters:</em><br />
 curl -s <a href="https://github.com/crossplane/crossplane/blob/main/ADOPTERS.md">https://github.com/crossplane/crossplane/blob/main/ADOPTERS.md</a> | grep -o -E 'github.com/[a-z]+/netclab-xp'</p>

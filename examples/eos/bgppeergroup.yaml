@@ -1,0 +1,15 @@
+apiVersion: eos.netclab.dev/v1alpha1
+kind: BgpPeerGroup
+metadata:
+  name: evpn-overlay-peers
+spec:
+  endpoint: ceos01.default.svc.cluster.local
+  peerGroupName: EVPN-OVERLAY-PEERS
+  nextHopUnchanged: true
+  updateSource: Loopback0
+  bfd: true
+  ebgpMultihop: 3
+  maximumRoutes: 0
+  sendCommunityTypes:
+  - EXTENDED
+  - STANDARD

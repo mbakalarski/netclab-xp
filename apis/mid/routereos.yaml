@@ -17,9 +17,9 @@ spec:
     served: true
     referenceable: true
     additionalPrinterColumns:
-    - name: NODE-PORT
+    - name: ENDPOINT
       type: string
-      jsonPath: .spec.nodePort
+      jsonPath: .spec.endpoint
     - name: ASN
       type: integer
       jsonPath: .spec.asn
@@ -34,9 +34,7 @@ spec:
           spec:
             type: object
             properties:
-              nodePort:
-                type: string
-              creds:
+              endpoint:
                 type: string
               asn:
                 type: integer
@@ -47,14 +45,14 @@ spec:
                 items:
                   type: object
                   properties:
-                    name:
+                    ifName:
                       type: string
                     ipv4Address:
                       type: string
                     ipv4PrefixLength:
                       type: integer
                   required:
-                  - name
+                  - ifName
                   - ipv4Address
                   - ipv4PrefixLength
               bgpNeighbors:
@@ -64,16 +62,15 @@ spec:
                   properties:
                     networkInstance:
                       type: string
+                      default: default
                     neighborAsn:
                       type: integer
                     neighborIp:
                       type: string
                   required:
-                  - networkInstance
                   - neighborAsn
                   - neighborIp
             required:
-            - nodePort
-            - creds
+            - endpoint
             - asn
             - routerId

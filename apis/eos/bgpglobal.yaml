@@ -14,9 +14,9 @@ spec:
   versions:
     - name: v1alpha1
       additionalPrinterColumns:
-      - name: NODE-PORT
+      - name: ENDPOINT
         type: string
-        jsonPath: .spec.nodePort
+        jsonPath: .spec.endpoint
       - name: ASN
         type: integer
         jsonPath: .spec.asn
@@ -32,16 +32,13 @@ spec:
             spec:
               type: object
               properties:
-                nodePort:
-                  type: string
-                creds:
+                endpoint:
                   type: string
                 asn:
                   type: integer
                 routerId:
                   type: string
               required:
-                - nodePort
-                - creds
+                - endpoint
                 - asn
                 - routerId

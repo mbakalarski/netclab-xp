@@ -8,13 +8,13 @@ metadata:
     meta.crossplane.io/description: Declarative router configuration and lifecycle management.
     meta.crossplane.io/readme: |
       GitOps-driven lifecycle management for physical, virtual, and containerized routers.
-      netclab-xp abstracts device-specific complexities, enabling consistent and reproducible network configuration using OpenConfig-based XRDs.
+      netclab-xp abstracts device-specific complexities, enabling consistent and reproducible network configuration.
 spec:
   dependsOn:
     - apiVersion: pkg.crossplane.io/v1
       kind: Provider
       package: xpkg.upbound.io/crossplane-contrib/provider-http
-      version: ">=v1.0.12"
+      version: "=v1.0.12"
 
     - apiVersion: pkg.crossplane.io/v1
       kind: Function
@@ -25,6 +25,11 @@ spec:
       kind: Function
       package: xpkg.upbound.io/crossplane-contrib/function-auto-ready
       version: ">=v0.5.2"
+
+    - apiVersion: pkg.crossplane.io/v1
+      kind: Function
+      package: xpkg.upbound.io/crossplane-contrib/function-environment-configs
+      version: ">=v0.4.0"
 
   crossplane:
     version: ">=v2.1.1"

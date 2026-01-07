@@ -1,0 +1,7 @@
+apiVersion: eos.netclab.dev/v1alpha1
+kind: LoopbackInterface
+metadata:
+  name: ceos01lo0
+spec:
+  endpoint: ceos01.default.svc.cluster.local
+  ifName: Loopback0

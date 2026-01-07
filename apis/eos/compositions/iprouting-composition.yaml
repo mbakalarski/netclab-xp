@@ -8,7 +8,22 @@ spec:
     kind: IpRouting
   mode: Pipeline
   pipeline:
-  - step: create-request
+  - step: environmentConfigs
+    functionRef:
+      name: crossplane-contrib-function-environment-configs
+    input:
+      apiVersion: environmentconfigs.fn.crossplane.io/v1beta1
+      kind: Input
+      spec:
+        environmentConfigs:
+        - type: Reference
+          ref:
+            name: endpoint-protocols
+        - type: Reference
+          ref:
+            name: eos-common-auth
+
+  - step: requests
     functionRef:
       name: crossplane-contrib-function-go-templating
     input:
@@ -17,6 +32,14 @@ spec:
       source: Inline
       inline:
         template: |
+          {{- $deviceUrl := "" }}
+          {{- $basicAuth := "" }}
+          {{- $address := .observed.composite.resource.spec.endpoint }}
+          {{- with index .context "apiextensions.crossplane.io/environment" }}
+            {{- $deviceUrl = printf "%s://%s:%d" .restconf.scheme $address .restconf.port }}
+            {{- $basicAuth = .basicAuth }}
+          {{- end }}
+          ---
           apiVersion: http.crossplane.io/v1alpha2
           kind: Request
           metadata:
@@ -27,9 +50,9 @@ spec:
               insecureSkipTLSVerify: true
               headers:
                 Accept: ["application/yang-data+json"]
-                Authorization: ["Basic {{ .observed.composite.resource.spec.creds }}"]
+                Authorization: ["Basic {{ $basicAuth }}"]
               payload:
-                baseUrl: "https://{{ .observed.composite.resource.spec.nodePort }}/restconf/data/openconfig-network-instance:network-instances/network-instance=default/config"
+                baseUrl: "{{ $deviceUrl }}/restconf/data/openconfig-network-instance:network-instances/network-instance=default/config"
                 body: |
                   { "arista-netinst-augments:ipv4-routing-enabled": true }
 

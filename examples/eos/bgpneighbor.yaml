@@ -1,0 +1,8 @@
+apiVersion: eos.netclab.dev/v1alpha1
+kind: BgpNeighbor
+metadata:
+  name: bgpneighbor
+spec:
+  endpoint: ceos01.default.svc.cluster.local
+  neighborAsn: 65002
+  neighborIp: 10.1.2.2
