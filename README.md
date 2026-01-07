@@ -3,7 +3,7 @@
 > ***Extend Kubernetes to manage any resource anywhere***
 > <br>Powered by [crossplane.io](https://www.crossplane.io)
 
-**Declarative Crossplane Configuration Package for Router Configuration Management**
+**Crossplane Configuration Package for Router Configuration Management**
 
 `netclab-xp` enables declarative, GitOps-driven lifecycle management of physical, virtualized, and containerized routers using Crossplane.
 It provides a layered abstractions, allowing network teams to manage router configuration consistently and reproducibly.
@@ -89,11 +89,11 @@ kind: Configuration
 metadata:
   name: netclab-xp
 spec:
-  package: xpkg.upbound.io/netclab/netclab-xp:v0.1.9
+  package: xpkg.upbound.io/netclab/netclab-xp:v0.2.0
 EOF
 ```
 
-#### 4. Add ProviderConfig for the HTTP provider
+#### 4. Add ProviderConfig and EnvironmentConfigs
 
 ```bash
 cat <<EOF | kubectl apply -f -
@@ -104,6 +104,25 @@ metadata:
 spec:
   credentials:
     source: None
+---
+apiVersion: apiextensions.crossplane.io/v1beta1
+kind: EnvironmentConfig
+metadata:
+  name: endpoint-protocols
+data:
+  restconf:
+    scheme: https
+    port: 6020
+  jsonrpc:
+    scheme: http
+    port: 6021
+---
+apiVersion: apiextensions.crossplane.io/v1beta1
+kind: EnvironmentConfig
+metadata:
+  name: eos-common-auth
+data:
+  basicAuth: YXJpc3RhOmFyaXN0YQ==
 EOF
 ```
 
@@ -186,9 +205,8 @@ kind: RoutedInterface
 metadata:
   name: r1e1ip
 spec:
-  deviceUrl: https://ceos01.default.svc.cluster.local:6020
-  creds: YXJpc3RhOmFyaXN0YQ==
-  name: Ethernet1
+  endpoint: ceos01.default.svc.cluster.local
+  ifName: Ethernet1
   ipv4Address: 10.10.10.1
   ipv4PrefixLength: 24
 EOF
@@ -203,8 +221,8 @@ kubectl get netclab
 Example output:
 
 ```bash
-NAME                                     DEVICE-URL                                      NAME        IPV4-ADDRESS   IPV4-PREFIX   SYNCED   READY   COMPOSITION                        AGE
-routedinterface.eos.netclab.dev/r1e1ip   https://ceos01.default.svc.cluster.local:6020   Ethernet1   10.10.10.1     24            True     True    routedinterfaces.eos.netclab.dev   7s
+NAME                                     ENDPOINT                           IF          IP           PLEN   SYNCED   READY   COMPOSITION                        AGE
+routedinterface.eos.netclab.dev/r1e1ip   ceos01.default.svc.cluster.local   Ethernet1   10.10.10.1   24     True     True    routedinterfaces.eos.netclab.dev   8s
 ```
 
 ### Check device configuration:
@@ -216,7 +234,7 @@ kubectl exec ceos01 -- Cli -p15 -c "show run int Ethernet1"
 ```console
 interface Ethernet1
    no switchport
-   ip address 10.1.2.1/24
+   ip address 10.10.10.1/24
 ```
 
 ### Remove configuration
@@ -238,12 +256,11 @@ kind: Router
 metadata:
   name: ceos01
 spec:
-  deviceUrl: https://ceos01.default.svc.cluster.local:6020
-  creds: YXJpc3RhOmFyaXN0YQ==
+  endpoint: ceos01.default.svc.cluster.local
   asn: 65001
   routerId: 10.0.0.1
   routedInterfaces:
-  - name: Ethernet1
+  - ifName: Ethernet1
     ipv4Address: 10.1.2.1
     ipv4PrefixLength: 24
   bgpNeighbors:
@@ -262,8 +279,8 @@ kubectl get router ceos01
 Example output:
 
 ```bash
-NAME     DEVICE-URL                                      ASN     ROUTER-ID   SYNCED   READY   COMPOSITION              AGE
-ceos01   https://ceos01.default.svc.cluster.local:6020   65001   10.0.0.1    True     True    router.eos.netclab.dev   2m4s
+NAME     ENDPOINT                           ASN     ROUTER-ID   SYNCED   READY   COMPOSITION               AGE
+ceos01   ceos01.default.svc.cluster.local   65001   10.0.0.1    True     True    routers.eos.netclab.dev   62s
 ```
 
 ### Verify all SYNCED and READY:
@@ -275,24 +292,24 @@ kubectl get netclab
 Example output:
 
 ```bash
-NAME                                            DEVICE-URL                                      ASN     ROUTER-ID   SYNCED   READY   COMPOSITION                  AGE
-bgpglobal.eos.netclab.dev/ceos01-2eedd4b1cab4   https://ceos01.default.svc.cluster.local:6020   65001   10.0.0.1    True     True    bgpglobals.eos.netclab.dev   3m52s
+NAME                                            ENDPOINT                           ASN     ROUTER-ID   SYNCED   READY   COMPOSITION                  AGE
+bgpglobal.eos.netclab.dev/ceos01-abcf5d7dbd2a   ceos01.default.svc.cluster.local   65001   10.0.0.1    True     True    bgpglobals.eos.netclab.dev   82s
 
-NAME                                              DEVICE-URL                                      NI        REMOTE-AS   REMOTE-IP   SYNCED   READY   COMPOSITION                    AGE
-bgpneighbor.eos.netclab.dev/ceos01-3e0f1822de8d   https://ceos01.default.svc.cluster.local:6020   default   65002       10.1.2.2    True     True    bgpneighbors.eos.netclab.dev   3m52s
+NAME                                              ENDPOINT                           VRF       REMOTE-AS   REMOTE-IP   SYNCED   READY   COMPOSITION                    AGE
+bgpneighbor.eos.netclab.dev/ceos01-973c82346f34   ceos01.default.svc.cluster.local   default   65002       10.1.2.2    True     True    bgpneighbors.eos.netclab.dev   82s
 
-NAME                                            DEVICE-URL                               SYNCED   READY   COMPOSITION                  AGE
-iprouting.eos.netclab.dev/ceos01-8c1ecd5acc68   https://ceos01.default.svc.cluster.local:6020   True     True    iproutings.eos.netclab.dev   3m52s
+NAME                                            ENDPOINT                           SYNCED   READY   COMPOSITION                  AGE
+iprouting.eos.netclab.dev/ceos01-5525df60016e   ceos01.default.svc.cluster.local   True     True    iproutings.eos.netclab.dev   82s
 
-NAME                                                    DEVICE-URL                                      NAME        SYNCED   READY   COMPOSITION                          AGE
-loopbackinterface.eos.netclab.dev/ceos01-06a18fc6671a   https://ceos01.default.svc.cluster.local:6020   Loopback0   True     True    loopbackinterfaces.eos.netclab.dev   3m52s
+NAME                                                    ENDPOINT                           IF          SYNCED   READY   COMPOSITION                          AGE
+loopbackinterface.eos.netclab.dev/ceos01-f7043813344c   ceos01.default.svc.cluster.local   Loopback0   True     True    loopbackinterfaces.eos.netclab.dev   82s
 
-NAME                                                  DEVICE-URL                                      NAME        IPV4-ADDRESS   IPV4-PREFIX   SYNCED   READY   COMPOSITION                        AGE
-routedinterface.eos.netclab.dev/ceos01-95e43dc583a0   https://ceos01.default.svc.cluster.local:6020   Ethernet1   10.1.2.1       24            True     True    routedinterfaces.eos.netclab.dev   3m52s
-routedinterface.eos.netclab.dev/ceos01-e2781936df2b   https://ceos01.default.svc.cluster.local:6020   Loopback0   10.0.0.1       32            True     True    routedinterfaces.eos.netclab.dev   3m52s
+NAME                                                  ENDPOINT                           IF          IP         PLEN   SYNCED   READY   COMPOSITION                        AGE
+routedinterface.eos.netclab.dev/ceos01-466930a040e3   ceos01.default.svc.cluster.local   Loopback0   10.0.0.1   32     True     True    routedinterfaces.eos.netclab.dev   82s
+routedinterface.eos.netclab.dev/ceos01-ce9e542ce06c   ceos01.default.svc.cluster.local   Ethernet1   10.1.2.1   24     True     True    routedinterfaces.eos.netclab.dev   82s
 
-NAME                            DEVICE-URL                                      ASN     ROUTER-ID   SYNCED   READY   COMPOSITION              AGE
-router.eos.netclab.dev/ceos01   https://ceos01.default.svc.cluster.local:6020   65001   10.0.0.1    True     True    router.eos.netclab.dev   3m52s
+NAME                            ENDPOINT                           ASN     ROUTER-ID   SYNCED   READY   COMPOSITION               AGE
+router.eos.netclab.dev/ceos01   ceos01.default.svc.cluster.local   65001   10.0.0.1    True     True    routers.eos.netclab.dev   82s
 ```
 
 ### Add ceos02:
@@ -304,12 +321,11 @@ kind: Router
 metadata:
   name: ceos02
 spec:
-  deviceUrl: https://ceos02.default.svc.cluster.local:6020
-  creds: YXJpc3RhOmFyaXN0YQ==
+  endpoint: ceos02.default.svc.cluster.local
   asn: 65002
   routerId: 10.0.0.2
   routedInterfaces:
-  - name: Ethernet1
+  - ifName: Ethernet1
     ipv4Address: 10.1.2.2
     ipv4PrefixLength: 24
   bgpNeighbors:
@@ -328,9 +344,9 @@ kubectl get routers
 Example output:
 
 ```bash
-NAME     DEVICE-URL                                      ASN     ROUTER-ID   SYNCED   READY   COMPOSITION              AGE
-ceos01   https://ceos01.default.svc.cluster.local:6020   65001   10.0.0.1    True     True    router.eos.netclab.dev   8m14s
-ceos02   https://ceos02.default.svc.cluster.local:6020   65002   10.0.0.2    True     True    router.eos.netclab.dev   35s
+NAME     ENDPOINT                           ASN     ROUTER-ID   SYNCED   READY   COMPOSITION               AGE
+ceos01   ceos01.default.svc.cluster.local   65001   10.0.0.1    True     True    routers.eos.netclab.dev   3m36s
+ceos02   ceos02.default.svc.cluster.local   65002   10.0.0.2    True     True    routers.eos.netclab.dev   59s
 ```
 
 ### Check BGP on the router:
@@ -344,7 +360,7 @@ BGP summary information for VRF default
 Router identifier 10.0.0.1, local AS number 65001
 Neighbor Status Codes: m - Under maintenance
   Neighbor V AS           MsgRcvd   MsgSent  InQ OutQ  Up/Down State   PfxRcd PfxAcc PfxAdv
-  10.1.2.2 4 65002             12        16    0    0 00:01:11 Estab   0      0      0
+  10.1.2.2 4 65002              5         5    0    0 00:01:19 Estab   0      0      0
 ```
 
 ### Remove all configuration:
