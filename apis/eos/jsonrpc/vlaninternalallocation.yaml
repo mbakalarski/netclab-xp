@@ -14,9 +14,9 @@ spec:
   versions:
   - name: v1alpha1
     additionalPrinterColumns:
-    - name: TARGET
+    - name: ENDPOINT
       type: string
-      jsonPath: .spec.deviceUrl
+      jsonPath: .spec.endpoint
     - name: ORDER
       type: string
       jsonPath: .spec.order
@@ -35,9 +35,7 @@ spec:
           spec:
             type: object
             properties:
-              deviceUrl:
-                type: string
-              creds:
+              endpoint:
                 type: string
               order:
                 type: string
@@ -55,7 +53,6 @@ spec:
                 - start
                 - end
             required:
-            - deviceUrl
-            - creds
+            - endpoint
             - order
             - range

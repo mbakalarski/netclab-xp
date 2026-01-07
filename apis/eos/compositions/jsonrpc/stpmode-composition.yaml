@@ -140,7 +140,6 @@ spec:
                   .response.body.error == null
                   and .response.body.result[1].spanningTreeInstances.MST0.protocol == "mstp"
 
-
   - step: auto-ready
     functionRef:
       name: crossplane-contrib-function-auto-ready
