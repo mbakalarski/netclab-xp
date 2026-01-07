@@ -1,14 +1,29 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: stpmodes.eos.netclab.dev
+  name: vlaninternalallocations.eos.netclab.dev
 spec:
   compositeTypeRef:
     apiVersion: eos.netclab.dev/v1alpha1
-    kind: StpMode
+    kind: VlanInternalAllocation
   mode: Pipeline
   pipeline:
-  - step: set-mode
+  - step: environmentConfigs
+    functionRef:
+      name: crossplane-contrib-function-environment-configs
+    input:
+      apiVersion: environmentconfigs.fn.crossplane.io/v1beta1
+      kind: Input
+      spec:
+        environmentConfigs:
+        - type: Reference
+          ref:
+            name: endpoint-protocols
+        - type: Reference
+          ref:
+            name: eos-common-auth
+
+  - step: requests
     functionRef:
       name: crossplane-contrib-function-go-templating
     input:
@@ -17,19 +32,27 @@ spec:
       source: Inline
       inline:
         template: |
+          {{- $deviceUrl := "" }}
+          {{- $basicAuth := "" }}
+          {{- $address := .observed.composite.resource.spec.endpoint }}
+          {{- with index .context "apiextensions.crossplane.io/environment" }}
+            {{- $deviceUrl = printf "%s://%s:%d" .jsonrpc.scheme $address .jsonrpc.port }}
+            {{- $basicAuth = .basicAuth }}
+          {{- end }}
+          ---
           apiVersion: http.crossplane.io/v1alpha2
           kind: Request
           metadata:
             annotations:
-              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-stpmode
+              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-internalvlanallocation
           spec:
             forProvider:
               insecureSkipTLSVerify: true
               headers:
                 Accept: ["application/json"]
-                Authorization: ["Basic {{ .observed.composite.resource.spec.creds }}"]
+                Authorization: ["Basic {{ $basicAuth }}"]
               payload:
-                baseUrl: "{{ .observed.composite.resource.spec.target }}/command-api"
+                baseUrl: "{{ $deviceUrl }}/command-api"
                 body: |
                   {
                     "jsonrpc": "2.0",
@@ -41,7 +64,7 @@ spec:
                       "cmds": [
                         "enable",
                         "configure",
-                        "spanning-tree mode {{ .observed.composite.resource.spec.stpMode }}"
+                        "vlan internal order {{ .observed.composite.resource.spec.order }} range {{ .observed.composite.resource.spec.range.start }} {{ .observed.composite.resource.spec.range.end }}"
                       ]
                     }
                   }
@@ -70,7 +93,7 @@ spec:
                       "format": "json",
                       "cmds": [
                         "enable",
-                         "show spanning-tree"
+                         "show vlan internal allocation policy"
                       ]
                     }
                   }
@@ -89,7 +112,7 @@ spec:
                       "cmds": [
                         "enable",
                         "configure",
-                        "spanning-tree mode mstp"
+                        "no vlan internal order"
                       ]
                     }
                   }
@@ -98,25 +121,17 @@ spec:
                 type: CUSTOM
                 logic: |
                   .response.body.error == null
-                  and
-                  (
-                    (
-                      "{{ .observed.composite.resource.spec.stpMode }}" == "none"
-                      and .response.body.result[1].spanningTreeInstances == {}
-                    )
-                    or
-                    (
-                      "{{ .observed.composite.resource.spec.stpMode }}" == "mstp"
-                      and .response.body.result[1].spanningTreeInstances.MST0.protocol == "mstp"
-                    )
-                  )
+                  and .response.body.result[1].policy == "{{ .observed.composite.resource.spec.order }}"
+                  and .response.body.result[1].startVlanId == {{ .observed.composite.resource.spec.range.start }}
+                  and .response.body.result[1].endVlanId == {{ .observed.composite.resource.spec.range.end }}
 
               isRemovedCheck:
                 type: CUSTOM
                 logic: |
                   .response.body.error == null
-                  and .response.body.result[1].spanningTreeInstances.MST0.protocol == "mstp"
-
+                  and .response.body.result[1].policy == "ascending"
+                  and .response.body.result[1].startVlanId == 1006
+                  and .response.body.result[1].endVlanId == 4094
 
   - step: auto-ready
     functionRef:

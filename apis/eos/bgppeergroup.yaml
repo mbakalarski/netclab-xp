@@ -1,0 +1,81 @@
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: bgppeergroups.eos.netclab.dev
+spec:
+  scope: Cluster
+  group: eos.netclab.dev
+  names:
+    kind: BgpPeerGroup
+    plural: bgppeergroups
+    categories:
+    - crossplane
+    - netclab
+  versions:
+  - name: v1alpha1
+    additionalPrinterColumns:
+    - name: ENDPOINT
+      type: string
+      jsonPath: .spec.endpoint
+    - name: VRF
+      type: string
+      jsonPath: .spec.networkInstance
+    - name: PG
+      type: string
+      jsonPath: .spec.peerGroupName
+    - name: NHU
+      type: boolean
+      jsonPath: .spec.nextHopUnchanged
+    - name: SRCIF
+      type: string
+      jsonPath: .spec.updateSource
+    - name: BFD
+      type: boolean
+      jsonPath: .spec.bfd
+    - name: EMH
+      type: integer
+      jsonPath: .spec.ebgpMultihop
+    - name: MAXRT
+      type: integer
+      jsonPath: .spec.maximumRoutes
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              endpoint:
+                type: string
+              networkInstance:
+                type: string
+                default: default
+              peerGroupName:
+                type: string
+              nextHopUnchanged:
+                type: boolean
+              updateSource:
+                type: string
+              bfd:
+                type: boolean
+                enum:
+                - true
+              ebgpMultihop:
+                type: integer
+                minimum: 1
+                maximum: 255
+              sendCommunityTypes:
+                type: array
+                items:
+                  type: string
+                  enum:
+                  - EXTENDED
+                  - STANDARD
+              maximumRoutes:
+                type: integer
+                minimum: 0
+            required:
+            - endpoint
+            - peerGroupName

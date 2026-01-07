@@ -8,7 +8,7 @@ spec:
     kind: Router
   mode: Pipeline
   pipeline:
-  - step: render-router
+  - step: router
     functionRef:
       name: crossplane-contrib-function-go-templating
     input:
@@ -17,15 +17,16 @@ spec:
       source: Inline
       inline:
         template: |
+          {{- $endpoint := .observed.composite.resource.spec.endpoint }}
+          ---
           apiVersion: eos.netclab.dev/v1alpha1
           kind: LoopbackInterface
           metadata:
             annotations:
               gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-lo0
           spec:
-            nodePort: {{ .observed.composite.resource.spec.nodePort }}
-            creds: {{ .observed.composite.resource.spec.creds }}
-            name: Loopback0
+            endpoint: {{ $endpoint }}
+            ifName: Loopback0
           ---
           apiVersion: eos.netclab.dev/v1alpha1
           kind: RoutedInterface
@@ -33,9 +34,8 @@ spec:
             annotations:
               gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-lo0-ip
           spec:
-            nodePort: {{ .observed.composite.resource.spec.nodePort }}
-            creds: {{ .observed.composite.resource.spec.creds }}
-            name: Loopback0
+            endpoint: {{ $endpoint }}
+            ifName: Loopback0
             ipv4Address: "{{ .observed.composite.resource.spec.routerId }}"
             ipv4PrefixLength: 32
           ---
@@ -45,8 +45,7 @@ spec:
             annotations:
               gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-bgp
           spec:
-            nodePort: {{ .observed.composite.resource.spec.nodePort }}
-            creds: {{ .observed.composite.resource.spec.creds }}
+            endpoint: {{ $endpoint }}
             asn: {{ int .observed.composite.resource.spec.asn }}
             routerId: "{{ .observed.composite.resource.spec.routerId }}"
           ---
@@ -56,8 +55,8 @@ spec:
             annotations:
               gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-routing
           spec:
-            nodePort: {{ .observed.composite.resource.spec.nodePort }}
-            creds: {{ .observed.composite.resource.spec.creds }}
+            endpoint: {{ $endpoint }}
+
           {{- range .observed.composite.resource.spec.routedInterfaces }}
           ---
           apiVersion: eos.netclab.dev/v1alpha1
@@ -66,12 +65,12 @@ spec:
             annotations:
               gotemplating.fn.crossplane.io/composition-resource-name: {{ $.observed.composite.resource.metadata.name }}-{{ .name }}
           spec:
-            nodePort: {{ $.observed.composite.resource.spec.nodePort }}
-            creds: {{ $.observed.composite.resource.spec.creds }}
-            name: {{ .name }}
+            endpoint: {{ $endpoint }}
+            ifName: {{ .ifName }}
             ipv4Address: "{{ .ipv4Address }}"
             ipv4PrefixLength: {{ .ipv4PrefixLength }}
           {{- end }}
+
           {{- range .observed.composite.resource.spec.bgpNeighbors }}
           ---
           apiVersion: eos.netclab.dev/v1alpha1
@@ -80,8 +79,7 @@ spec:
             annotations:
               gotemplating.fn.crossplane.io/composition-resource-name: {{ $.observed.composite.resource.metadata.name }}-{{ .neighborIp }}
           spec:
-            nodePort: {{ $.observed.composite.resource.spec.nodePort }}
-            creds: {{ $.observed.composite.resource.spec.creds }}
+            endpoint: {{ $endpoint }}
             networkInstance: {{ .networkInstance }}
             neighborAsn: {{ int .neighborAsn }}
             neighborIp: "{{ .neighborIp }}"

@@ -14,12 +14,12 @@ spec:
   versions:
     - name: v1alpha1
       additionalPrinterColumns:
-      - name: NODE-PORT
+      - name: ENDPOINT
         type: string
-        jsonPath: .spec.nodePort
-      - name: NAME
+        jsonPath: .spec.endpoint
+      - name: IF
         type: string
-        jsonPath: .spec.name
+        jsonPath: .spec.ifName
       served: true
       referenceable: true
       schema:
@@ -29,13 +29,10 @@ spec:
             spec:
               type: object
               properties:
-                nodePort:
+                endpoint:
                   type: string
-                creds:
-                  type: string
-                name:
+                ifName:
                   type: string
               required:
-                - nodePort
-                - creds
-                - name
+                - endpoint
+                - ifName
