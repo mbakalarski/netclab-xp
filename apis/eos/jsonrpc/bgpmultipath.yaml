@@ -1,13 +1,13 @@
 apiVersion: apiextensions.crossplane.io/v2
 kind: CompositeResourceDefinition
 metadata:
-  name: bgpglobals.eos.netclab.dev
+  name: bgpmultipaths.eos.netclab.dev
 spec:
   scope: Cluster
   group: eos.netclab.dev
   names:
-    kind: BgpGlobal
-    plural: bgpglobals
+    kind: BgpMultiPath
+    plural: bgpmultipaths
     categories:
     - crossplane
     - netclab
@@ -20,9 +20,9 @@ spec:
     - name: ASN
       type: integer
       jsonPath: .spec.asn
-    - name: ROUTER-ID
-      type: string
-      jsonPath: .spec.routerId
+    - name: MPATH
+      type: integer
+      jsonPath: .spec.maximumPaths.number
     served: true
     referenceable: true
     schema:
@@ -36,12 +36,6 @@ spec:
                 type: string
               asn:
                 type: integer
-              routerId:
-                type: string
-              disableBgpDefaultIpv4Unicast:
-                type: boolean
-                enum:
-                - true
               maximumPaths:
                 type: object
                 properties:
@@ -59,6 +53,6 @@ spec:
                 - rule: "has(self.ecmp) ? self.number <= self.ecmp : true"
                   message: "maximumPaths.number must be less than or equal to maximumPaths.ecmp"
             required:
-              - endpoint
-              - asn
-              - routerId
+            - endpoint
+            - asn
+            - maximumPaths
