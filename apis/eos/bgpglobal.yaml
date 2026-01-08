@@ -12,50 +12,53 @@ spec:
     - crossplane
     - netclab
   versions:
-    - name: v1alpha1
-      additionalPrinterColumns:
-      - name: ENDPOINT
-        type: string
-        jsonPath: .spec.endpoint
-      - name: ASN
-        type: integer
-        jsonPath: .spec.asn
-      - name: ROUTER-ID
-        type: string
-        jsonPath: .spec.routerId
-      served: true
-      referenceable: true
-      schema:
-        openAPIV3Schema:
-          type: object
-          properties:
-            spec:
-              type: object
-              properties:
-                endpoint:
-                  type: string
-                asn:
-                  type: integer
-                routerId:
-                  type: string
-                disableBgpDefaultIpv4Unicast:
-                  type: boolean
-                  enum:
-                  - true
-                maximumPaths:
-                  type: object
-                  properties:
-                    number:
-                      type: integer
-                      minimum: 1
-                      maximum: 128
-                    ecmp:
-                      type: integer
-                      minimum: 1
-                      maximum: 128
-                  required:
-                  - number
-              required:
-                - endpoint
-                - asn
-                - routerId
+  - name: v1alpha1
+    additionalPrinterColumns:
+    - name: ENDPOINT
+      type: string
+      jsonPath: .spec.endpoint
+    - name: ASN
+      type: integer
+      jsonPath: .spec.asn
+    - name: ROUTER-ID
+      type: string
+      jsonPath: .spec.routerId
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              endpoint:
+                type: string
+              asn:
+                type: integer
+              routerId:
+                type: string
+              disableBgpDefaultIpv4Unicast:
+                type: boolean
+                enum:
+                - true
+              maximumPaths:
+                type: object
+                properties:
+                  number:
+                    type: integer
+                    minimum: 1
+                    maximum: 128
+                  ecmp:
+                    type: integer
+                    minimum: 1
+                    maximum: 128
+                required:
+                - number
+                x-kubernetes-validations:
+                - rule: "has(self.ecmp) ? self.number <= self.ecmp : true"
+                  message: "maximumPaths.number must be less than or equal to maximumPaths.ecmp"
+            required:
+              - endpoint
+              - asn
+              - routerId
