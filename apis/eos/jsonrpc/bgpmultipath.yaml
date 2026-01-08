@@ -1,0 +1,55 @@
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: bgpmultipaths.eos.netclab.dev
+spec:
+  scope: Cluster
+  group: eos.netclab.dev
+  names:
+    kind: BgpMultiPath
+    plural: bgpmultipaths
+    categories:
+    - crossplane
+    - netclab
+  versions:
+  - name: v1alpha1
+    additionalPrinterColumns:
+    - name: ENDPOINT
+      type: string
+      jsonPath: .spec.endpoint
+    - name: ASN
+      type: integer
+      jsonPath: .spec.asn
+    - name: MPATH
+      type: integer
+      jsonPath: .spec.maximumPaths.number
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              endpoint:
+                type: string
+              asn:
+                type: integer
+              maximumPaths:
+                type: object
+                properties:
+                  number:
+                    type: integer
+                    minimum: 1
+                    maximum: 128
+                  ecmp:
+                    type: integer
+                    minimum: 1
+                    maximum: 128
+                required:
+                - number
+            required:
+            - endpoint
+            - asn
+            - maximumPaths

@@ -1,18 +1,18 @@
 apiVersion: eos.netclab.dev/v1alpha1
 kind: Router
 metadata:
-  name: dc1-spine1
+  name: ceos01-spine
 spec:
-  endpoint: dc1-spine1.default.svc.cluster.local
+  endpoint: ceos01.default.svc.cluster.local
 
   bgp:
     asn: 65100
     routerId: 10.255.0.1
     bgpDefaultIpv4Unicast: false
 
-    maximumPaths:
-      ecmp: 4
-      ecmpInstalled: 4
+    # maximumPaths:
+    #   ecmp: 4
+    #   ecmpInstalled: 4
 
     redistribute:
       connected:

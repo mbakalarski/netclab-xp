@@ -32,6 +32,8 @@ spec:
       source: Inline
       inline:
         template: |
+          {{ $resourceNamePrefix := .observed.composite.resource.metadata.name }}
+
           {{- $deviceUrl := "" }}
           {{- $basicAuth := "" }}
           {{- $address := .observed.composite.resource.spec.endpoint }}
@@ -39,12 +41,16 @@ spec:
             {{- $deviceUrl = printf "%s://%s:%d" .restconf.scheme $address .restconf.port }}
             {{- $basicAuth = .basicAuth }}
           {{- end }}
+
+          {{ $asn := .observed.composite.resource.spec.asn }}
+          {{ $routerId := .observed.composite.resource.spec.routerId }}
+
           ---
           apiVersion: http.crossplane.io/v1alpha2
           kind: Request
           metadata:
             annotations:
-              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-asid
+              gotemplating.fn.crossplane.io/composition-resource-name: {{ $resourceNamePrefix }}-asid
           spec:
             forProvider:
               insecureSkipTLSVerify: true
@@ -54,7 +60,7 @@ spec:
               payload:
                 baseUrl: "{{ $deviceUrl }}/restconf/data/openconfig-network-instance:network-instances/network-instance=default/protocols/protocol=BGP,BGP/bgp/global/config"
                 body: |
-                  { "openconfig-network-instance:as": {{ .observed.composite.resource.spec.asn }}, "openconfig-network-instance:router-id": "{{ .observed.composite.resource.spec.routerId }}" }
+                  { "openconfig-network-instance:as": {{ $asn }}, "openconfig-network-instance:router-id": "{{ $routerId }}" }
 
               mappings:
               - action: CREATE
@@ -74,13 +80,13 @@ spec:
                 method: DELETE
                 url: .payload.baseUrl
 
-          {{- if and (hasKey .observed.composite.resource.spec "noBgpDefaultIpv4Unicast") .observed.composite.resource.spec.noBgpDefaultIpv4Unicast }}
+          {{- if and (hasKey .observed.composite.resource.spec "disableBgpDefaultIpv4Unicast") .observed.composite.resource.spec.disableBgpDefaultIpv4Unicast }}
           ---
           apiVersion: http.crossplane.io/v1alpha2
           kind: Request
           metadata:
             annotations:
-              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-disableV4U
+              gotemplating.fn.crossplane.io/composition-resource-name: {{ $resourceNamePrefix }}-disableIp4
           spec:
             forProvider:
               insecureSkipTLSVerify: true
@@ -109,6 +115,21 @@ spec:
               - action: REMOVE
                 method: DELETE
                 url: .payload.baseUrl
+          {{- end }}
+
+          {{- if hasKey .observed.composite.resource.spec "maximumPaths" }}
+          ---
+          apiVersion: eos.netclab.dev/v1alpha1
+          kind: BgpMultiPath
+          metadata:
+            annotations:
+              gotemplating.fn.crossplane.io/composition-resource-name: {{ $resourceNamePrefix }}-mpath
+          spec:
+            endpoint: {{ $address }}
+            asn: {{ $asn }}
+            maximumPaths:
+              number: {{ .observed.composite.resource.spec.maximumPaths.number }}
+              ecmp: {{ .observed.composite.resource.spec.maximumPaths.ecmp }}
           {{- end }}
 
   - step: auto-ready
