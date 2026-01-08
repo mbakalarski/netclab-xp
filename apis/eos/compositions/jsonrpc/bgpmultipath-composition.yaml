@@ -1,0 +1,149 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: bgpmultipaths.eos.netclab.dev
+spec:
+  compositeTypeRef:
+    apiVersion: eos.netclab.dev/v1alpha1
+    kind: BgpMultiPath
+  mode: Pipeline
+  pipeline:
+  - step: environmentConfigs
+    functionRef:
+      name: crossplane-contrib-function-environment-configs
+    input:
+      apiVersion: environmentconfigs.fn.crossplane.io/v1beta1
+      kind: Input
+      spec:
+        environmentConfigs:
+        - type: Reference
+          ref:
+            name: endpoint-protocols
+        - type: Reference
+          ref:
+            name: eos-common-auth
+
+  - step: requests
+    functionRef:
+      name: crossplane-contrib-function-go-templating
+    input:
+      apiVersion: gotemplating.fn.crossplane.io/v1beta1
+      kind: GoTemplate
+      source: Inline
+      inline:
+        template: |
+          {{- $deviceUrl := "" }}
+          {{- $basicAuth := "" }}
+          {{- $address := .observed.composite.resource.spec.endpoint }}
+          {{- with index .context "apiextensions.crossplane.io/environment" }}
+            {{- $deviceUrl = printf "%s://%s:%d" .jsonrpc.scheme $address .jsonrpc.port }}
+            {{- $basicAuth = .basicAuth }}
+          {{- end }}
+
+          {{- $asn := .observed.composite.resource.spec.asn }}
+          {{- $maximumPathsNumber := .observed.composite.resource.spec.maximumPaths.number }}
+          {{- $maximumPathsEcmp := .observed.composite.resource.spec.maximumPaths.ecmp }}
+          ---
+          apiVersion: http.crossplane.io/v1alpha2
+          kind: Request
+          metadata:
+            annotations:
+              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-mpath
+          spec:
+            forProvider:
+              insecureSkipTLSVerify: true
+              headers:
+                Accept: ["application/json"]
+                Authorization: ["Basic {{ $basicAuth }}"]
+              payload:
+                baseUrl: "{{ $deviceUrl }}/command-api"
+                body: |
+                  {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "runCmds",
+                    "params": {
+                      "version": 1,
+                      "format": "json",
+                      "cmds": [
+                        "enable",
+                        "configure",
+                        "router bgp {{ $asn }}",
+                        {{- if hasKey .observed.composite.resource.spec.maximumPaths "ecmp" }}
+                        "maximum-paths {{ $maximumPathsNumber }} ecmp {{ $maximumPathsEcmp }}"
+                        {{- else }}
+                        "maximum-paths {{ $maximumPathsNumber }}"
+                        {{- end }}
+                      ]
+                    }
+                  }
+
+              mappings:
+              - action: CREATE
+                method: POST
+                body: .payload.body
+                url: .payload.baseUrl
+
+              - action: UPDATE
+                method: POST
+                body: .payload.body
+                url: .payload.baseUrl
+
+              - action: OBSERVE
+                method: POST
+                url: .payload.baseUrl
+                body: |
+                  {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "runCmds",
+                    "params": {
+                      "version": 1,
+                      "format": "json",
+                      "cmds": [
+                        "enable",
+                        "show running-config"
+                      ]
+                    }
+                  }
+
+              - action: REMOVE
+                method: POST
+                url: .payload.baseUrl
+                body: |
+                  {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "runCmds",
+                    "params": {
+                      "version": 1,
+                      "format": "json",
+                      "cmds": [
+                        "enable",
+                        "configure",
+                        "router bgp {{ $asn }}",
+                        "no maximum-paths"
+                      ]
+                    }
+                  }
+
+              expectedResponseCheck:
+                type: CUSTOM
+                logic: |
+                  .response.body.error == null
+                  and (
+                    .response.body.result[1].cmds."router bgp {{ $asn }}".cmds
+                    | has("maximum-paths {{ $maximumPathsNumber }} ecmp {{ $maximumPathsEcmp }}")
+                  )
+
+              isRemovedCheck:
+                type: CUSTOM
+                logic: |
+                  .response.body.error == null
+                  and (
+                    .response.body.result[1].cmds."router bgp {{ $asn }}".cmds
+                    | has("maximum-paths {{ $maximumPathsNumber }} ecmp {{ $maximumPathsEcmp }}") | not )
+
+  - step: auto-ready
+    functionRef:
+      name: crossplane-contrib-function-auto-ready
