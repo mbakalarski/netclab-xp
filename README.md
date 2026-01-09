@@ -93,7 +93,7 @@ spec:
 EOF
 ```
 
-#### 4. Add ProviderConfig, EnvironmentConfig end Secret
+#### 4. Add ProviderConfig, EnvironmentConfig and Secret
 
 ```bash
 cat <<EOF | kubectl apply -f -
