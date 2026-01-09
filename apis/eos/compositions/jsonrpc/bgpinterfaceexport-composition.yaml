@@ -40,10 +40,10 @@ spec:
             {{- $basicAuth = .basicAuth }}
           {{- end }}
 
-          {{- $asn := .observed.composite.resource.spec.asn }}
+          {{- $asn := printf "%d" .observed.composite.resource.spec.asn }}
           {{- $ifname := .observed.composite.resource.spec.ifName }}
           {{- $ifaddress := .observed.composite.resource.spec.ipv4Address }}
-          {{- $ifplen := .observed.composite.resource.spec.ipv4PrefixLength }}
+          {{- $ifplen := printf "%d" .observed.composite.resource.spec.ipv4PrefixLength }}
 
           {{- $rmname := printf "%s%s%s" "RM-" $ifname "-2-BGP" }}
           {{- $plname := printf "%s%s" "PL-" $ifname }}
@@ -51,14 +51,17 @@ spec:
           {{- $cmd1 := "" }}
           {{- $cmd2 := "" }}
 
-          {{- cmd1 = printf "%s %s" "ip prefix-list" $plname }}
-          {{- cmd2 = printf "%s %s/%s eq %s" "seq 10 permit" $ifaddress $ifplen $ifplen }}
+          {{ $compositeName := .observed.composite.resource.metadata.name }}
+
+
+          {{- $cmd1 = printf "%s %s" "ip prefix-list" $plname }}
+          {{- $cmd2 = printf "%s %s/%s eq %s" "seq 10 permit" $ifaddress $ifplen $ifplen }}
           ---
           apiVersion: http.crossplane.io/v1alpha2
           kind: Request
           metadata:
             annotations:
-              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-bie
+              {{ setResourceNameAnnotation (print $compositeName "-pl") }}
           spec:
             forProvider:
               insecureSkipTLSVerify: true
@@ -78,8 +81,8 @@ spec:
                       "cmds": [
                         "enable",
                         "configure",
-                        {{ $cmd1 }},
-                        {{ $cmd2 }}"
+                        "{{ $cmd1 }}",
+                        "{{ $cmd2 }}"
                       ]
                     }
                   }
@@ -127,7 +130,7 @@ spec:
                       "cmds": [
                         "enable",
                         "configure",
-                        {{ printf "%s %s" "no" $cmd1 }}"
+                        "{{ printf "%s %s" "no" $cmd1 }}"
                       ]
                     }
                   }
@@ -148,14 +151,14 @@ spec:
                     .response.body.result[1].cmds | has("{{ $cmd1 }}") | not
                   )
 
-          {{- cmd1 = printf "%s %s permit 10" "route-map" $rmname }}
-          {{- cmd2 = printf "%s %s" "match ip address prefix-list" $plname }}
+          {{- $cmd1 = printf "%s %s permit 10" "route-map" $rmname }}
+          {{- $cmd2 = printf "%s %s" "match ip address prefix-list" $plname }}
           ---
           apiVersion: http.crossplane.io/v1alpha2
           kind: Request
           metadata:
             annotations:
-              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-bie
+              {{ setResourceNameAnnotation (print $compositeName "-rm") }}
           spec:
             forProvider:
               insecureSkipTLSVerify: true
@@ -175,8 +178,8 @@ spec:
                       "cmds": [
                         "enable",
                         "configure",
-                        {{ $cmd1 }},
-                        {{ $cmd2 }}"
+                        "{{ $cmd1 }}",
+                        "{{ $cmd2 }}"
                       ]
                     }
                   }
@@ -224,7 +227,7 @@ spec:
                       "cmds": [
                         "enable",
                         "configure",
-                        {{ printf "%s %s" "no" $cmd1 }}"
+                        "{{ printf "%s %s" "no" $cmd1 }}"
                       ]
                     }
                   }
@@ -245,14 +248,14 @@ spec:
                     .response.body.result[1].cmds | has("{{ $cmd1 }}") | not
                   )
 
-          {{- cmd1 = printf "%s %s" "router bgp" $asn }}
-          {{- cmd2 = printf "%s %s" "redistribute connected route-map" $rmname }}
+          {{- $cmd1 = printf "%s %s" "router bgp" $asn }}
+          {{- $cmd2 = printf "%s %s" "redistribute connected route-map" $rmname }}
           ---
           apiVersion: http.crossplane.io/v1alpha2
           kind: Request
           metadata:
             annotations:
-              gotemplating.fn.crossplane.io/composition-resource-name: {{ .observed.composite.resource.metadata.name }}-bie
+              {{ setResourceNameAnnotation (print $compositeName "-bie") }}
           spec:
             forProvider:
               insecureSkipTLSVerify: true
@@ -272,8 +275,8 @@ spec:
                       "cmds": [
                         "enable",
                         "configure",
-                        {{ $cmd1 }},
-                        {{ $cmd2 }}"
+                        "{{ $cmd1 }}",
+                        "{{ $cmd2 }}"
                       ]
                     }
                   }
@@ -321,8 +324,8 @@ spec:
                       "cmds": [
                         "enable",
                         "configure",
-                        {{ $cmd1 }},
-                        {{ printf "%s %s" "no" $cmd2 }}
+                        "{{ $cmd1 }}",
+                        "{{ printf "%s %s" "no" $cmd2 }}"
                       ]
                     }
                   }
