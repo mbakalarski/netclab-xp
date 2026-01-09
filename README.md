@@ -93,7 +93,7 @@ spec:
 EOF
 ```
 
-#### 4. Add ProviderConfig and EnvironmentConfigs
+#### 4. Add ProviderConfig, EnvironmentConfig end Secret
 
 ```bash
 cat <<EOF | kubectl apply -f -
@@ -117,10 +117,12 @@ data:
     scheme: http
     port: 6021
 ---
-apiVersion: apiextensions.crossplane.io/v1beta1
-kind: EnvironmentConfig
+apiVersion: v1
+kind: Secret
 metadata:
-  name: eos-common-auth
+  name: eos-creds
+  namespace: crossplane-system
+type: Opaque
 data:
   basicAuth: YXJpc3RhOmFyaXN0YQ==
 EOF
