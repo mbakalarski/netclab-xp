@@ -1,0 +1,356 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: bgpinterfaceexports.eos.netclab.dev
+spec:
+  compositeTypeRef:
+    apiVersion: eos.netclab.dev/v1alpha1
+    kind: BgpInterfaceExport
+  mode: Pipeline
+  pipeline:
+  - step: environmentConfigs
+    functionRef:
+      name: crossplane-contrib-function-environment-configs
+    input:
+      apiVersion: environmentconfigs.fn.crossplane.io/v1beta1
+      kind: Input
+      spec:
+        environmentConfigs:
+        - type: Reference
+          ref:
+            name: endpoint-protocols
+
+  - step: requests
+    functionRef:
+      name: crossplane-contrib-function-go-templating
+
+    credentials:
+    - name: eos-creds
+      secretRef:
+        name: eos-creds
+        namespace: crossplane-system
+      source: Secret
+
+    input:
+      apiVersion: gotemplating.fn.crossplane.io/v1beta1
+      kind: GoTemplate
+      source: Inline
+      inline:
+        template: |
+          {{- $deviceUrl := "" }}
+          {{- $basicAuth := "" }}
+          {{- $address := .observed.composite.resource.spec.endpoint }}
+          {{- with index .context "apiextensions.crossplane.io/environment" }}
+            {{- $deviceUrl = printf "%s://%s:%d" .jsonrpc.scheme $address .jsonrpc.port }}
+          {{- end }}
+          {{- $basicAuth := ( getCredentialData . "eos-creds" ).basicAuth | toString | b64enc }}
+
+          {{- $asn := printf "%d" .observed.composite.resource.spec.asn }}
+          {{- $ifname := .observed.composite.resource.spec.ifName }}
+          {{- $ifaddress := .observed.composite.resource.spec.ipv4Address }}
+          {{- $ifplen := printf "%d" .observed.composite.resource.spec.ipv4PrefixLength }}
+
+          {{- $rmname := printf "%s%s%s" "RM-" $ifname "-2-BGP" }}
+          {{- $plname := printf "%s%s" "PL-" $ifname }}
+
+          {{- $cmd1 := "" }}
+          {{- $cmd2 := "" }}
+
+          {{ $compositeName := .observed.composite.resource.metadata.name }}
+
+
+          {{- $cmd1 = printf "%s %s" "ip prefix-list" $plname }}
+          {{- $cmd2 = printf "%s %s/%s eq %s" "seq 10 permit" $ifaddress $ifplen $ifplen }}
+          ---
+          apiVersion: http.crossplane.io/v1alpha2
+          kind: Request
+          metadata:
+            annotations:
+              {{ setResourceNameAnnotation (print $compositeName "-pl") }}
+          spec:
+            forProvider:
+              insecureSkipTLSVerify: true
+              headers:
+                Accept: ["application/json"]
+                Authorization: ["Basic {{ $basicAuth }}"]
+              payload:
+                baseUrl: "{{ $deviceUrl }}/command-api"
+                body: |
+                  {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "runCmds",
+                    "params": {
+                      "version": 1,
+                      "format": "json",
+                      "cmds": [
+                        "enable",
+                        "configure",
+                        "{{ $cmd1 }}",
+                        "{{ $cmd2 }}"
+                      ]
+                    }
+                  }
+
+              mappings:
+              - action: CREATE
+                method: POST
+                body: .payload.body
+                url: .payload.baseUrl
+
+              - action: UPDATE
+                method: POST
+                body: .payload.body
+                url: .payload.baseUrl
+
+              - action: OBSERVE
+                method: POST
+                url: .payload.baseUrl
+                body: |
+                  {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "runCmds",
+                    "params": {
+                      "version": 1,
+                      "format": "json",
+                      "cmds": [
+                        "enable",
+                        "show running-config"
+                      ]
+                    }
+                  }
+
+              - action: REMOVE
+                method: POST
+                url: .payload.baseUrl
+                body: |
+                  {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "runCmds",
+                    "params": {
+                      "version": 1,
+                      "format": "json",
+                      "cmds": [
+                        "enable",
+                        "configure",
+                        "{{ printf "%s %s" "no" $cmd1 }}"
+                      ]
+                    }
+                  }
+
+              expectedResponseCheck:
+                type: CUSTOM
+                logic: |
+                  .response.body.error == null
+                  and (
+                    .response.body.result[1].cmds."{{ $cmd1 }}".cmds | has("{{ $cmd2 }}")
+                  )
+
+              isRemovedCheck:
+                type: CUSTOM
+                logic: |
+                  .response.body.error == null
+                  and (
+                    .response.body.result[1].cmds | has("{{ $cmd1 }}") | not
+                  )
+
+          {{- $cmd1 = printf "%s %s permit 10" "route-map" $rmname }}
+          {{- $cmd2 = printf "%s %s" "match ip address prefix-list" $plname }}
+          ---
+          apiVersion: http.crossplane.io/v1alpha2
+          kind: Request
+          metadata:
+            annotations:
+              {{ setResourceNameAnnotation (print $compositeName "-rm") }}
+          spec:
+            forProvider:
+              insecureSkipTLSVerify: true
+              headers:
+                Accept: ["application/json"]
+                Authorization: ["Basic {{ $basicAuth }}"]
+              payload:
+                baseUrl: "{{ $deviceUrl }}/command-api"
+                body: |
+                  {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "runCmds",
+                    "params": {
+                      "version": 1,
+                      "format": "json",
+                      "cmds": [
+                        "enable",
+                        "configure",
+                        "{{ $cmd1 }}",
+                        "{{ $cmd2 }}"
+                      ]
+                    }
+                  }
+
+              mappings:
+              - action: CREATE
+                method: POST
+                body: .payload.body
+                url: .payload.baseUrl
+
+              - action: UPDATE
+                method: POST
+                body: .payload.body
+                url: .payload.baseUrl
+
+              - action: OBSERVE
+                method: POST
+                url: .payload.baseUrl
+                body: |
+                  {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "runCmds",
+                    "params": {
+                      "version": 1,
+                      "format": "json",
+                      "cmds": [
+                        "enable",
+                        "show running-config"
+                      ]
+                    }
+                  }
+
+              - action: REMOVE
+                method: POST
+                url: .payload.baseUrl
+                body: |
+                  {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "runCmds",
+                    "params": {
+                      "version": 1,
+                      "format": "json",
+                      "cmds": [
+                        "enable",
+                        "configure",
+                        "{{ printf "%s %s" "no" $cmd1 }}"
+                      ]
+                    }
+                  }
+
+              expectedResponseCheck:
+                type: CUSTOM
+                logic: |
+                  .response.body.error == null
+                  and (
+                    .response.body.result[1].cmds."{{ $cmd1 }}".cmds | has("{{ $cmd2 }}")
+                  )
+
+              isRemovedCheck:
+                type: CUSTOM
+                logic: |
+                  .response.body.error == null
+                  and (
+                    .response.body.result[1].cmds | has("{{ $cmd1 }}") | not
+                  )
+
+          {{- $cmd1 = printf "%s %s" "router bgp" $asn }}
+          {{- $cmd2 = printf "%s %s" "redistribute connected route-map" $rmname }}
+          ---
+          apiVersion: http.crossplane.io/v1alpha2
+          kind: Request
+          metadata:
+            annotations:
+              {{ setResourceNameAnnotation (print $compositeName "-bie") }}
+          spec:
+            forProvider:
+              insecureSkipTLSVerify: true
+              headers:
+                Accept: ["application/json"]
+                Authorization: ["Basic {{ $basicAuth }}"]
+              payload:
+                baseUrl: "{{ $deviceUrl }}/command-api"
+                body: |
+                  {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "runCmds",
+                    "params": {
+                      "version": 1,
+                      "format": "json",
+                      "cmds": [
+                        "enable",
+                        "configure",
+                        "{{ $cmd1 }}",
+                        "{{ $cmd2 }}"
+                      ]
+                    }
+                  }
+
+              mappings:
+              - action: CREATE
+                method: POST
+                body: .payload.body
+                url: .payload.baseUrl
+
+              - action: UPDATE
+                method: POST
+                body: .payload.body
+                url: .payload.baseUrl
+
+              - action: OBSERVE
+                method: POST
+                url: .payload.baseUrl
+                body: |
+                  {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "runCmds",
+                    "params": {
+                      "version": 1,
+                      "format": "json",
+                      "cmds": [
+                        "enable",
+                        "show running-config"
+                      ]
+                    }
+                  }
+
+              - action: REMOVE
+                method: POST
+                url: .payload.baseUrl
+                body: |
+                  {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "runCmds",
+                    "params": {
+                      "version": 1,
+                      "format": "json",
+                      "cmds": [
+                        "enable",
+                        "configure",
+                        "{{ $cmd1 }}",
+                        "{{ printf "%s %s" "no" $cmd2 }}"
+                      ]
+                    }
+                  }
+
+              expectedResponseCheck:
+                type: CUSTOM
+                logic: |
+                  .response.body.error == null
+                  and (
+                    .response.body.result[1].cmds."{{ $cmd1 }}".cmds | has("{{ $cmd2 }}")
+                  )
+
+              isRemovedCheck:
+                type: CUSTOM
+                logic: |
+                  .response.body.error == null
+                  and (
+                    .response.body.result[1].cmds."{{ $cmd1 }}".cmds | has("{{ $cmd2 }}") | not
+                  )
+
+  - step: auto-ready
+    functionRef:
+      name: crossplane-contrib-function-auto-ready

@@ -89,11 +89,11 @@ kind: Configuration
 metadata:
   name: netclab-xp
 spec:
-  package: xpkg.upbound.io/netclab/netclab-xp:v0.2.3
+  package: xpkg.upbound.io/netclab/netclab-xp:v0.2.4
 EOF
 ```
 
-#### 4. Add ProviderConfig and EnvironmentConfigs
+#### 4. Add ProviderConfig, EnvironmentConfig and Secret
 
 ```bash
 cat <<EOF | kubectl apply -f -
@@ -117,10 +117,12 @@ data:
     scheme: http
     port: 6021
 ---
-apiVersion: apiextensions.crossplane.io/v1beta1
-kind: EnvironmentConfig
+apiVersion: v1
+kind: Secret
 metadata:
-  name: eos-common-auth
+  name: eos-creds
+  namespace: crossplane-system
+type: Opaque
 data:
   basicAuth: YXJpc3RhOmFyaXN0YQ==
 EOF

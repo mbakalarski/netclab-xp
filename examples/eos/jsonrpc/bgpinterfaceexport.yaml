@@ -1,0 +1,10 @@
+apiVersion: eos.netclab.dev/v1alpha1
+kind: BgpInterfaceExport
+metadata:
+  name: ceos01lo0
+spec:
+  endpoint: ceos01.default.svc.cluster.local
+  asn: 65001
+  ifName: Loopback0
+  ipv4Address: 10.0.0.1
+  ipv4PrefixLength: 32
