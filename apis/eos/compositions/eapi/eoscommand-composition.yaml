@@ -1,0 +1,36 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: eoscommands.eos.netclab.dev
+spec:
+  compositeTypeRef:
+    apiVersion: eos.netclab.dev/v1alpha1
+    kind: EosCommand
+  mode: Pipeline
+  pipeline:
+  - step: environmentConfigs
+    functionRef:
+      name: crossplane-contrib-function-environment-configs
+    input:
+      apiVersion: environmentconfigs.fn.crossplane.io/v1beta1
+      kind: Input
+      spec:
+        environmentConfigs:
+        - type: Reference
+          ref:
+            name: endpoint-protocols
+
+  - step: requests
+    functionRef:
+      name: function-eapi
+    requirements:
+      requiredResources:
+      - requirementName: eos-creds
+        apiVersion: v1
+        kind: Secret
+        name: eos-creds
+        namespace: crossplane-system
+
+  - step: auto-ready
+    functionRef:
+      name: crossplane-contrib-function-auto-ready
