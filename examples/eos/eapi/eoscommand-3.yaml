@@ -1,11 +1,33 @@
+---
 apiVersion: eos.netclab.dev/v1alpha1
 kind: EosCommand
 metadata:
-  name: eoscommand-3
+  name: eoscommand-31
 spec:
   endpoint: ceos01.default.svc.cluster.local
   cmds:
-    router bgp 65100:
+    interface Loopback0: {}
+---
+apiVersion: eos.netclab.dev/v1alpha1
+kind: EosCommand
+metadata:
+  name: eoscommand-32
+spec:
+  endpoint: ceos01.default.svc.cluster.local
+  cmds:
+    router bgp 65001: {}
+---
+apiVersion: eos.netclab.dev/v1alpha1
+kind: EosCommand
+metadata:
+  name: eoscommand-33
+spec:
+  endpoint: ceos01.default.svc.cluster.local
+  cmds:
+    ip routing: {}
+    interface Loopback0:
+      ip address 10.255.0.1/32: {}
+    router bgp 65001:
       router-id 10.255.0.1: {}
       no bgp default ipv4-unicast: {}
       maximum-paths 4 ecmp 4: {}

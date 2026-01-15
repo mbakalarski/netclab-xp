@@ -1,7 +1,16 @@
 apiVersion: eos.netclab.dev/v1alpha1
 kind: EosCommand
 metadata:
-  name: eoscommand-1
+  name: eoscommand-11
+spec:
+  endpoint: ceos01.default.svc.cluster.local
+  cmds:
+    ip prefix-list PL-Loopback0: {}
+---
+apiVersion: eos.netclab.dev/v1alpha1
+kind: EosCommand
+metadata:
+  name: eoscommand-12
 spec:
   endpoint: ceos01.default.svc.cluster.local
   cmds:

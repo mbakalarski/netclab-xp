@@ -1,10 +1,20 @@
 apiVersion: eos.netclab.dev/v1alpha1
 kind: EosCommand
 metadata:
-  name: eoscommand-2
+  name: eoscommand-21
+spec:
+  endpoint: ceos01.default.svc.cluster.local
+  cmds:
+    router bgp 65001: {}
+---
+apiVersion: eos.netclab.dev/v1alpha1
+kind: EosCommand
+metadata:
+  name: eoscommand-22
 spec:
   endpoint: ceos01.default.svc.cluster.local
   cmds:
     router bgp 65001:
+      neighbor EVPN-OVERLAY-PEERS peer group: {}
       address-family evpn:
         neighbor EVPN-OVERLAY-PEERS activate: {}
