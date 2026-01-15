@@ -31,5 +31,10 @@ spec:
       package: xpkg.upbound.io/crossplane-contrib/function-environment-configs
       version: ">=v0.4.0"
 
+    - apiVersion: pkg.crossplane.io/v1
+      kind: Function
+      package: ghcr.io/mbakalarski/function-eapi
+      version: "=v0.0.12"
+
   crossplane:
     version: ">=v2.1.1"
