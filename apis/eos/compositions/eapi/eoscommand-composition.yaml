@@ -22,7 +22,7 @@ spec:
 
   - step: requests
     functionRef:
-      name: function-eapi
+      name: mbakalarski-function-eapi
     requirements:
       requiredResources:
       - requirementName: eos-creds
