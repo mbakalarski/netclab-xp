@@ -3,6 +3,8 @@ kind: CompositeResourceDefinition
 metadata:
   name: eoscommands.eos.netclab.dev
 spec:
+  defaultCompositionRef:
+    name: eoscommands.eos.netclab.dev
   scope: Cluster
   group: eos.netclab.dev
   names:

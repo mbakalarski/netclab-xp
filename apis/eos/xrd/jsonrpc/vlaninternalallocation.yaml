@@ -3,6 +3,8 @@ kind: CompositeResourceDefinition
 metadata:
   name: vlaninternalallocations.eos.netclab.dev
 spec:
+  defaultCompositionRef:
+    name: vlaninternalallocations.eos.netclab.dev
   scope: Cluster
   group: eos.netclab.dev
   names:
