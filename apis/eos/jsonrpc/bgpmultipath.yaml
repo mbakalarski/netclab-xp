@@ -49,6 +49,9 @@ spec:
                     maximum: 128
                 required:
                 - number
+                x-kubernetes-validations:
+                - rule: "has(self.ecmp) ? self.number <= self.ecmp : true"
+                  message: "maximumPaths.number must be less than or equal to maximumPaths.ecmp"
             required:
             - endpoint
             - asn

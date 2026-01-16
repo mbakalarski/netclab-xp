@@ -19,13 +19,18 @@ spec:
         - type: Reference
           ref:
             name: endpoint-protocols
-        - type: Reference
-          ref:
-            name: eos-common-auth
 
   - step: requests
     functionRef:
       name: crossplane-contrib-function-go-templating
+
+    credentials:
+    - name: eos-creds
+      secretRef:
+        name: eos-creds
+        namespace: crossplane-system
+      source: Secret
+
     input:
       apiVersion: gotemplating.fn.crossplane.io/v1beta1
       kind: GoTemplate
@@ -37,8 +42,8 @@ spec:
           {{- $address := .observed.composite.resource.spec.endpoint }}
           {{- with index .context "apiextensions.crossplane.io/environment" }}
             {{- $deviceUrl = printf "%s://%s:%d" .restconf.scheme $address .restconf.port }}
-            {{- $basicAuth = .basicAuth }}
           {{- end }}
+          {{- $basicAuth := ( getCredentialData . "eos-creds" ).basicAuth | toString | b64enc }}
           ---
           apiVersion: http.crossplane.io/v1alpha2
           kind: Request

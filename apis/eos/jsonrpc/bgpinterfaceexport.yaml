@@ -1,0 +1,50 @@
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: bgpinterfaceexports.eos.netclab.dev
+spec:
+  scope: Cluster
+  group: eos.netclab.dev
+  names:
+    kind: BgpInterfaceExport
+    plural: bgpinterfaceexports
+    categories:
+    - crossplane
+    - netclab
+  versions:
+  - name: v1alpha1
+    additionalPrinterColumns:
+    - name: ENDPOINT
+      type: string
+      jsonPath: .spec.endpoint
+    - name: ASN
+      type: integer
+      jsonPath: .spec.asn
+    - name: IF
+      type: string
+      jsonPath: .spec.ifName
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              endpoint:
+                type: string
+              asn:
+                type: integer
+              ifName:
+                type: string
+              ipv4Address:
+                type: string
+              ipv4PrefixLength:
+                type: integer
+                maximum: 32
+            required:
+            - endpoint
+            - ifName
+            - ipv4Address
+            - ipv4PrefixLength
