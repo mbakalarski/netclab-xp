@@ -1,13 +1,15 @@
 apiVersion: apiextensions.crossplane.io/v2
 kind: CompositeResourceDefinition
 metadata:
-  name: bgpinterfaceexports.eos.netclab.dev
+  name: stpmodes.eos.netclab.dev
 spec:
+  defaultCompositionRef:
+    name: stpmodes.eos.netclab.dev
   scope: Cluster
   group: eos.netclab.dev
   names:
-    kind: BgpInterfaceExport
-    plural: bgpinterfaceexports
+    kind: StpMode
+    plural: stpmodes
     categories:
     - crossplane
     - netclab
@@ -17,12 +19,9 @@ spec:
     - name: ENDPOINT
       type: string
       jsonPath: .spec.endpoint
-    - name: ASN
-      type: integer
-      jsonPath: .spec.asn
-    - name: IF
+    - name: STP
       type: string
-      jsonPath: .spec.ifName
+      jsonPath: .spec.stpMode
     served: true
     referenceable: true
     schema:
@@ -34,17 +33,11 @@ spec:
             properties:
               endpoint:
                 type: string
-              asn:
-                type: integer
-              ifName:
+              stpMode:
                 type: string
-              ipv4Address:
-                type: string
-              ipv4PrefixLength:
-                type: integer
-                maximum: 32
+                enum:
+                - mstp
+                - none
             required:
             - endpoint
-            - ifName
-            - ipv4Address
-            - ipv4PrefixLength
+            - stpMode

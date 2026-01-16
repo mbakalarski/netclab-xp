@@ -3,6 +3,8 @@ kind: CompositeResourceDefinition
 metadata:
   name: bgppeergroups.eos.netclab.dev
 spec:
+  defaultCompositionRef:
+    name: bgppeergroups.eos.netclab.dev
   scope: Cluster
   group: eos.netclab.dev
   names:
