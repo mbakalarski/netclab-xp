@@ -1,0 +1,50 @@
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: eoscommands.eos.netclab.dev
+spec:
+  scope: Cluster
+  group: eos.netclab.dev
+  names:
+    kind: EosCommand
+    plural: eoscommands
+    categories:
+    - crossplane
+    - netclab
+
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    additionalPrinterColumns:
+    - name: ENDPOINT
+      type: string
+      jsonPath: .spec.endpoint
+
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              endpoint:
+                type: string
+              cmds:
+                type: object
+                additionalProperties:
+                  type: object
+                  additionalProperties:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      additionalProperties:
+                        type: object
+                        additionalProperties:
+                          type: object
+                          properties: {}
+            required:
+            - endpoint
+            - cmds
+        required:
+        - spec
