@@ -39,6 +39,8 @@ spec:
               properties:
                 endpoint:
                   type: string
+                asn:
+                  type: integer
                 creds:
                   type: string
                 networkInstance:
