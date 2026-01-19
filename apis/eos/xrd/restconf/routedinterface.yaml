@@ -1,13 +1,15 @@
 apiVersion: apiextensions.crossplane.io/v2
 kind: CompositeResourceDefinition
 metadata:
-  name: bgpneighbors.eos.netclab.dev
+  name: routedinterfaces.eos.netclab.dev
 spec:
+  defaultCompositionRef:
+    name: routedinterfaces.eos.netclab.dev
   scope: Cluster
   group: eos.netclab.dev
   names:
-    kind: BgpNeighbor
-    plural: bgpneighbors
+    kind: RoutedInterface
+    plural: routedinterfaces
     categories:
     - crossplane
     - netclab
@@ -17,15 +19,15 @@ spec:
       - name: ENDPOINT
         type: string
         jsonPath: .spec.endpoint
-      - name: VRF
+      - name: IF
         type: string
-        jsonPath: .spec.networkInstance
-      - name: REMOTE-AS
+        jsonPath: .spec.ifName
+      - name: IP
+        type: string
+        jsonPath: .spec.ipv4Address
+      - name: PLEN
         type: integer
-        jsonPath: .spec.neighborAsn
-      - name: REMOTE-IP
-        type: string
-        jsonPath: .spec.neighborIp
+        jsonPath: .spec.ipv4PrefixLength
       served: true
       referenceable: true
       schema:
@@ -37,16 +39,14 @@ spec:
               properties:
                 endpoint:
                   type: string
-                creds:
+                ifName:
                   type: string
-                networkInstance:
+                ipv4Address:
                   type: string
-                  default: default
-                neighborAsn:
+                ipv4PrefixLength:
                   type: integer
-                neighborIp:
-                  type: string
               required:
                 - endpoint
-                - neighborAsn
-                - neighborIp
+                - ifName
+                - ipv4Address
+                - ipv4PrefixLength

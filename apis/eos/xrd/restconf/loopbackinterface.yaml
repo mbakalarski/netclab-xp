@@ -1,13 +1,15 @@
 apiVersion: apiextensions.crossplane.io/v2
 kind: CompositeResourceDefinition
 metadata:
-  name: routedinterfaces.eos.netclab.dev
+  name: loopbackinterfaces.eos.netclab.dev
 spec:
+  defaultCompositionRef:
+    name: loopbackinterfaces.eos.netclab.dev
   scope: Cluster
   group: eos.netclab.dev
   names:
-    kind: RoutedInterface
-    plural: routedinterfaces
+    kind: LoopbackInterface
+    plural: loopbackinterfaces
     categories:
     - crossplane
     - netclab
@@ -20,12 +22,6 @@ spec:
       - name: IF
         type: string
         jsonPath: .spec.ifName
-      - name: IP
-        type: string
-        jsonPath: .spec.ipv4Address
-      - name: PLEN
-        type: integer
-        jsonPath: .spec.ipv4PrefixLength
       served: true
       referenceable: true
       schema:
@@ -39,12 +35,6 @@ spec:
                   type: string
                 ifName:
                   type: string
-                ipv4Address:
-                  type: string
-                ipv4PrefixLength:
-                  type: integer
               required:
                 - endpoint
                 - ifName
-                - ipv4Address
-                - ipv4PrefixLength

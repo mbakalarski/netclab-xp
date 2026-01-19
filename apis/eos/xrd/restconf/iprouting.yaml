@@ -1,13 +1,15 @@
 apiVersion: apiextensions.crossplane.io/v2
 kind: CompositeResourceDefinition
 metadata:
-  name: loopbackinterfaces.eos.netclab.dev
+  name: iproutings.eos.netclab.dev
 spec:
+  defaultCompositionRef:
+    name: iproutings.eos.netclab.dev
   scope: Cluster
   group: eos.netclab.dev
   names:
-    kind: LoopbackInterface
-    plural: loopbackinterfaces
+    kind: IpRouting
+    plural: iproutings
     categories:
     - crossplane
     - netclab
@@ -17,9 +19,6 @@ spec:
       - name: ENDPOINT
         type: string
         jsonPath: .spec.endpoint
-      - name: IF
-        type: string
-        jsonPath: .spec.ifName
       served: true
       referenceable: true
       schema:
@@ -31,8 +30,5 @@ spec:
               properties:
                 endpoint:
                   type: string
-                ifName:
-                  type: string
               required:
                 - endpoint
-                - ifName
