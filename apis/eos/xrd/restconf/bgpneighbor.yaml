@@ -48,6 +48,8 @@ spec:
                   type: integer
                 neighborIp:
                   type: string
+                peerGroup:
+                  type: string
               required:
                 - endpoint
                 - neighborAsn
