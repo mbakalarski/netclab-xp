@@ -54,5 +54,4 @@ spec:
                   type: string
               required:
                 - endpoint
-                - neighborAsn
                 - neighborIp
