@@ -22,6 +22,9 @@ spec:
     - name: ENDPOINT
       type: string
       jsonPath: .spec.endpoint
+    - name: CONTAINER_RM
+      type: boolean
+      jsonPath: .spec.removeContainer
 
     schema:
       openAPIV3Schema:
@@ -32,6 +35,9 @@ spec:
             properties:
               endpoint:
                 type: string
+              removeContainer:
+                type: boolean
+                default: false
               cmds:
                 type: object
                 additionalProperties:
