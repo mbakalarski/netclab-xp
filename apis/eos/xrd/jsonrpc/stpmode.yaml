@@ -36,7 +36,6 @@ spec:
               stpMode:
                 type: string
                 enum:
-                - mstp
                 - none
             required:
             - endpoint
