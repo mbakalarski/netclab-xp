@@ -1,0 +1,10 @@
+apiVersion: netclab.dev/v1alpha1
+kind: CliConfigSource
+metadata:
+  name: ceos01-config
+spec:
+  version: a5d01648e468a6637b41f5078d7d1c45985a796c
+  endpoint: ceos01.default.svc.cluster.local
+  configMapRef:
+    name: ceos01-cm
+    namespace: default

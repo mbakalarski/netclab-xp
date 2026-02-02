@@ -1,0 +1,17 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: cliconfigsources.netclab.dev
+spec:
+  compositeTypeRef:
+    apiVersion: netclab.dev/v1alpha1
+    kind: CliConfigSource
+  mode: Pipeline
+  pipeline:
+  - step: create-cliconfigs
+    functionRef:
+      name: netclab-function-cli-expand
+
+  - step: auto-ready
+    functionRef:
+      name: crossplane-contrib-function-auto-ready

@@ -1,0 +1,62 @@
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: cliconfigsources.netclab.dev
+spec:
+  defaultCompositionRef:
+    name: cliconfigsources.netclab.dev
+  scope: Cluster
+  group: netclab.dev
+  names:
+    kind: CliConfigSource
+    plural: cliconfigsources
+    categories:
+    - crossplane
+    - netclab
+
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    additionalPrinterColumns:
+    - name: ENDPOINT
+      type: string
+      jsonPath: .spec.endpoint
+    - name: VERSION
+      type: string
+      jsonPath: .spec.version
+    - name: CM_REF_NAME
+      type: string
+      jsonPath: .spec.configMapRef.name
+    - name: CM_REF_NS
+      type: string
+      jsonPath: .spec.configMapRef.namespace
+
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              version:
+                type: string
+              endpoint:
+                type: string
+              configMapRef:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  namespace:
+                    type: string
+                    default: default
+                required:
+                - name
+                - namespace
+            required:
+            - endpoint
+            - version
+            - configMapRef
+        required:
+        - spec

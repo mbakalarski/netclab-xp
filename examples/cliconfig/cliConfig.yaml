@@ -1,0 +1,9 @@
+apiVersion: netclab.dev/v1alpha1
+kind: CliConfig
+metadata:
+  name: ceos01-config
+spec:
+  endpoint: ceos01.default.svc.cluster.local
+  cmds:
+    ip prefix-list PL-Loopback0:
+      seq 10 permit 10.0.0.1/32 eq 32: {}
